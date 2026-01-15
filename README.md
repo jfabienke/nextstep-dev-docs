@@ -63,7 +63,7 @@
 - [E — Reducing Memory Usage](Concepts/Performance/E_ReducingMemoryUsage.md)
 - [F — Zone Allocation](Concepts/Performance/F_ZoneAllocation.md)
 - [G — Link Optimization](Concepts/Performance/G_LinkOptimization.md)
-- [H — Application Performance Checklist](Concepts/Performance/H_Checklist.md)
+- [H — Application Performance Checklist](Concepts/Performance/H_ApplicationPerformanceChecklist.md)
 - [I — Listings for the Timing Class](Concepts/Performance/I_TimingClassListings.md)
 
 #### Portability
