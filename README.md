@@ -67,10 +67,10 @@
 - [I — Listings for the Timing Class](Concepts/Performance/I_TimingClassListings.md)
 
 #### Mach
-- [1. Concepts](Concepts/Mach/01_Concepts.md)
-- [2. Using Mach Messages](Concepts/Mach/02_Messages.md) <!-- Missing -->
-- [3. Using Loadable Kernel Servers](Concepts/Mach/03_KernelServers.md) <!-- Missing -->
-- [4. Mach Functions](Concepts/Mach/04_Functions.md) <!-- Missing -->
+- [1. Concepts](Mach/01_Concepts.md)
+- [2. Using Mach Messages](Mach/02_Messages.md)
+- [3. Using Loadable Kernel Servers](Mach/03_KernelServers.md)
+- [4. Mach Functions](Mach/04_Functions.md) <!-- In Progress: Large reference chapter -->
 
 #### Portability
 - [Building Portable NEXTSTEP Applications](Concepts/PortabilityGuide.md)
