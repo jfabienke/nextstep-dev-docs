@@ -77,6 +77,7 @@
 - [8. Network Modules](Mach/08_Network.md)
 - [9. Building, Loading, and Debugging Loadable Kernel Servers](Mach/09_Building.md)
 - [10. Kernel Support Functions](Mach/10_KernelSupportFunctions.md) <!-- Partial: General Functions only -->
+- [Appendix A — Utilities for Loadable Kernel Servers](Mach/AppendixA_Utilities.md)
 
 #### Portability
 - [Building Portable NEXTSTEP Applications](Concepts/PortabilityGuide.md)
