@@ -70,7 +70,10 @@
 - [1. Concepts](Mach/01_Concepts.md)
 - [2. Using Mach Messages](Mach/02_Messages.md)
 - [3. Using Loadable Kernel Servers](Mach/03_KernelServers.md)
-- [4. Mach Functions](Mach/04_Functions.md) <!-- In Progress: Large reference chapter -->
+- [4. Mach Functions](Mach/04_Functions.md) <!-- Partial: C-Thread and some Mach kernel functions -->
+- [5. Overview of Loadable Kernel Servers](Mach/05_Overview.md)
+- [6. Designing Loadable Kernel Servers](Mach/06_Designing.md)
+- [7. NeXTbus Device Drivers](Mach/07_NeXTbus.md)
 
 #### Portability
 - [Building Portable NEXTSTEP Applications](Concepts/PortabilityGuide.md)
