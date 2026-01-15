@@ -74,6 +74,7 @@
 - [5. Overview of Loadable Kernel Servers](Mach/05_Overview.md)
 - [6. Designing Loadable Kernel Servers](Mach/06_Designing.md)
 - [7. NeXTbus Device Drivers](Mach/07_NeXTbus.md)
+- [8. Network Modules](Mach/08_Network.md)
 
 #### Portability
 - [Building Portable NEXTSTEP Applications](Concepts/PortabilityGuide.md)
