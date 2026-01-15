@@ -76,6 +76,7 @@
 - [7. NeXTbus Device Drivers](Mach/07_NeXTbus.md)
 - [8. Network Modules](Mach/08_Network.md)
 - [9. Building, Loading, and Debugging Loadable Kernel Servers](Mach/09_Building.md)
+- [10. Kernel Support Functions](Mach/10_KernelSupportFunctions.md) <!-- Partial: General Functions only -->
 
 #### Portability
 - [Building Portable NEXTSTEP Applications](Concepts/PortabilityGuide.md)
