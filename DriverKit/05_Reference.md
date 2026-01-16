@@ -3119,6 +3119,341 @@ An example of implementing performCommand:data: follows.
 
 ---
 
+### IOPCIDeviceDescription
+
+**Inherits From:** IOEISADeviceDescription : IODeviceDescription : Object
+
+**Declared In:** driverkit/i386/IOPCIDeviceDescription.h
+
+#### Class Description
+
+IOPCIDeviceDescription objects encapsulate information about IODirectDevices that run on PCI-compliant computers. Usually, you need only to pass around IOPCIDeviceDescriptions, without creating them, subclassing them, or sending messages to them. IOPCIDeviceDescriptions are created by the system and initialized from IOConfigTables.
+
+This object encapsulates the PCI Configuration Space address of the device. This address contains three fields:
+
+- Device number, ranging from 0 to 31
+- Function number, ranging from 0 to 7
+- Bus number, ranging from 0 to 255
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Getting config address of PCI device**
+- `– getPCIdevice:function:bus:`
+
+#### Instance Methods
+
+##### getPCIdevice:function:bus:
+
+```objc
+- (IOReturn)getPCIdevice:(unsigned char *)deviceNumber
+                function:(unsigned char *)functionNumber
+                     bus:(unsigned char *)busNumber
+```
+
+This method allows callers to get the PCI config address of the PCI device associated with this device description. If all goes well, the three parameters are filled in and `IO_R_SUCCESS` is returned. There are a variety of reasons that the address couldn't be known, in which case an appropriate code is returned and the parameters are left untouched. It is acceptable for any of the parameter pointers to be `nil`.
+
+---
+
+### IOPCMCIADeviceDescription
+
+**Inherits From:** IOEISADeviceDescription : IODeviceDescription : Object
+
+**Declared In:** driverkit/i386/IOPCMCIADeviceDescription.h
+
+#### Class Description
+
+IOPCMCIADeviceDescription objects encapsulate information about IODirectDevices that run on PCMCIA-compliant computers. Usually, you need only to pass around IOPCMCIADeviceDescriptions, without creating them, subclassing them, or sending messages to them. IOPCMCIADeviceDescriptions are created by the system and initialized from IOConfigTables.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Getting information about tuples**
+- `– numTuples`
+- `– tupleList`
+
+#### Instance Methods
+
+##### numTuples
+
+```objc
+- (unsigned)numTuples
+```
+
+Returns the number of items in the tuple list.
+
+**See also:** `– tupleList`
+
+##### tupleList
+
+```objc
+- (id *)tupleList
+```
+
+Returns the tuple list.
+
+**See also:** `– numTuples`
+
+---
+
+### IOPCMCIATuple
+
+**Inherits From:** Object
+
+**Declared In:** driverkit/i386/IOPCMCIATuple.h
+
+#### Class Description
+
+IOPCMCIATuple objects encapsulate configuration information about IODirectDevices that run on PCMCIA-compliant computers. Data from a "tuple" is from information stored on the PCMCIA card; each tuple stores a separate piece of information. IOPCMCIADeviceDescription objects typically contain a list of IOPCMCIATuple objects, containing such configuration data as electrical requirements, I/O port ranges, and timing information.
+
+Usually, you need only to pass around IOPCMCIATuple objects, without creating them, subclassing them, or sending messages to them. IOPCMCIATuples are created by the system.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Getting information from a tuple**
+- `– code`
+- `– data`
+- `– length`
+
+#### Instance Methods
+
+##### code
+
+```objc
+- (unsigned char)code
+```
+
+Returns a code describing the contents of the tuple, as described in the PCMCIA standard.
+
+**See also:** `– data`, `– length`
+
+##### data
+
+```objc
+- (unsigned char *)data
+```
+
+Returns the tuple data, which is in machine readable form.
+
+**See also:** `– code`, `– length`
+
+##### length
+
+```objc
+- (unsigned)length
+```
+
+Returns the length of the tuple data in bytes.
+
+**See also:** `– code`, `– data`
+
+---
+
+### IOSCSIController
+
+**Inherits From:** IODirectDevice : IODevice : Object
+
+**Conforms To:** IOSCSIControllerExported
+
+**Declared In:** driverkit/IOSCSIController.h
+
+#### Class Description
+
+IOSCSIController is an abstract class for managing SCSI controllers. It provides a framework for making SCSI requests and providing standard statistics. It also provides an I/O thread.
+
+##### Implementing a Subclass
+
+To write a driver for a SCSI controller, you create a subclass of IOSCSIController. Your subclass must do the following:
+
+- Implement `probe:` (as documented in IODevice) and `initFromDeviceDescription:`. These let your driver create instances of itself.
+- Implement `executeRequest:buffer:client:` and `resetSCSIBus`.
+- Implement timeouts, as described in "Implementing Timeouts," below.
+- Implement `interruptOccurred`, as documented in IODirectDevice.
+
+To support standard statistics, you should implement `sumQueueLengths`, `maxQueueLength`, `numQueueSamples`, and `resetStats`, as described in "Supporting Standard Statistics," below.
+
+##### Implementing Timeouts
+
+To implement timeouts, you need to implement the `timeoutOccurred:` method (as documented in IODirectDevice) and make sure that your driver sends a timeout message whenever a request has taken too much time. To do the latter, your `executeRequest:buffer:client:` method should use `IOScheduleFunc()` to schedule a function; the method should then start I/O. If the I/O finishes before the function has executed, `executeRequest:buffer:client:` should unschedule the function. Otherwise, the function should send a timeout message (one with a msg_id field set to `IO_TIMEOUT_MSG`) to the instance's interrupt port. An example is below. Italicized text delineated in angle brackets is to be filled in with device-specific code.
+
+In `executeRequest:buffer:client:`:
+
+```objc
+/* ...Construct a device-dependent command buffer "ccb"...
+   Since the function we schedule won't be called from the I/O
+   task, it must use msg_send_from_kernel. This means that we
+   must convert the interrupt port from the I/O task space to one
+   that's valid in the regular kernel space. We do this in
+   initFromDeviceDescription: as follows:
+
+   interruptPortKern = IOConvertPort([self interruptPort],
+       IO_KernelIOTask, IO_Kernel);
+*/
+ccb->timeoutPort = interruptPortKern;
+IOScheduleFunc(myTimeout, ccb, scsiRequest->timeoutLength);
+/* ...Start the I/O and wait for it to finish... */
+(void)IOUnscheduleFunc(myTimeout, ccb);
+```
+
+```objc
+/* This method just logs a warning and sends a timeout message. */
+static void myTimeout(void *arg)
+{
+    struct ccb *ccb = arg;
+    msg_header_t msg;
+
+    if(!ccb->in_use) {
+        /* Race condition - this CCB got completed another way. */
+        return;
+    }
+
+    msg.msg_remote_port = ccb->timeoutPort;
+    msg.msg_id = IO_TIMEOUT_MSG;
+    IOLog("mySCSIController timeout\n");
+    (void)msg_send_from_kernel(&msg, MSG_OPTION_NONE, 0);
+}
+```
+
+##### Supporting Standard Statistics
+
+Subclasses of IOSCSIController can provide information used by the iostat command and any other statistics-gathering modules. To provide this information, the IOSCSIController must look at the number of requests in its queue of I/O requests, keeping track of the following:
+
+- The total number of requests detected in the queue. The IOSCSIController should implement `sumQueueLengths` so that it returns this value.
+- The highest number of requests in the queue at one time. This value should be returned by `maxQueueLength`.
+- The number of times the driver has looked at the queue. The `numQueueSamples` method should return this value.
+
+For example, assume the IOSCSIController has looked at its list of outstanding I/O requests three times, and found 1 request the first time, 5 the second, and 2 the third. At this point, `sumQueueLengths` should return 8, `maxQueueLength` should return 5, and `numQueueSamples` should return 3. The average number of requests in the list is `sumQueueLengths` divided by `numQueueSamples`.
+
+The IOSCSIController should reset all these values to 0 whenever it receives a `resetStats` message.
+
+#### Instance Variables
+
+None declared.
+
+#### Adopted Protocols
+
+**IOSCSIControllerExported**
+- `– allocateBufferOfLength:actualStart:actualLength:`
+- `– executeRequest:buffer:client:`
+- `– getDMAAlignment:`
+- `– maxTransfer`
+- `– releaseTarget:lun:forOwner:`
+- `– reserveTarget:lun:forOwner:`
+- `– resetSCSIBus`
+- `– returnFromScStatus:`
+
+#### Method Types
+
+**Initializing a newly allocated IOSCSIController**
+- `– initFromDeviceDescription:`
+
+**Reserving target/lun pairs**
+- `– numReserved`
+
+**Getting and setting parameters**
+- `– getIntValues:forParameter:count:`
+- `– setIntValues:forParameter:count:`
+
+**Collecting statistics**
+- `– maxQueueLength`
+- `– numQueueSamples`
+- `– sumQueueLengths`
+- `– resetStats`
+
+#### Instance Methods
+
+##### getIntValues:forParameter:count:
+
+```objc
+- (IOReturn)getIntValues:(unsigned int *)parameterArray
+            forParameter:(IOParameterName)parameterName
+                   count:(unsigned int *)count
+```
+
+Handles the two parameters specific to SCSI controllers--`IO_SCSI_CONTROLLER_STATS` and `IO_IS_A_SCSI_CONTROLLER`--and forwards the handling of all other parameters to super. The array of values returned for `IO_SCSI_CONTROLLER_STATS` is set to the numbers returned by `maxQueueLength`, `numQueueSamples`, and `sumQueueLengths`. No array is returned for `IO_IS_A_SCSI_CONTROLLER`; only `IO_R_SUCCESS` is returned, to indicate that this IODevice is indeed a SCSI controller.
+
+**See also:** `– setIntValues:forParameter:count:`
+
+##### initFromDeviceDescription:
+
+```objc
+- initFromDeviceDescription:deviceDescription
+```
+
+Initializes a new IOSCSIController instance. After invoking IODirectDevice's version of `initFromDeviceDescription:`, this method starts an I/O thread (with `startIOThread`) and sets its unit, name, and device kind. Each IOSCSIController has its own unit number. The first instance's unit is 0, the second is 1, and so on. The name is the concatenation of "sc" and the unit (for example, "sc0"), and the device kind is "sc".
+
+This method also determines the alignment restrictions for the hardware, using the `getDMAAlignment:` method. The alignment restrictions are used by the method `allocateBufferOfLength:actualStart:actualLength:`.
+
+This method returns `nil` and frees the instance if initialization failed; otherwise, it returns `self`.
+
+You should implement this method to invoke IOSCSIController's version and to then perform any driver-dependent initialization, including initializing the hardware and (at the very end) invoking `registerDevice`.
+
+##### maxQueueLength
+
+```objc
+- (unsigned int)maxQueueLength
+```
+
+Returns zero. Subclasses that support standard statistics should implement this method so that it returns the highest number of requests queued since this instance was initialized or `resetStats` was last called. See the class description for more information on supporting standard statistics.
+
+##### numQueueSamples
+
+```objc
+- (unsigned int)numQueueSamples
+```
+
+Returns zero. Subclasses that support standard statistics should implement this method so that it returns the number of times the instance has collected information about its queue of I/O requests. This number should be reset to 0 when this instance is initialized and when `resetStats` is called. See the class description for more information on supporting standard statistics.
+
+##### numReserved
+
+```objc
+- (unsigned int)numReserved
+```
+
+Returns the number of target/lun pairs that are reserved. Each pair corresponds to an active device on the SCSI bus that this instance controls.
+
+**See also:** `– reserveTarget:lun:forOwner:` and `– releaseTarget:lun:forOwner:` (IOSCSIControllerExported protocol)
+
+##### resetStats
+
+```objc
+- (void)resetStats
+```
+
+Does nothing. Subclasses that support standard statistics should implement this method so that it resets to zero the numbers that are returned by `maxQueueLength`, `numQueueSamples`, and `sumQueueLengths`. See the class description for more information on supporting standard statistics.
+
+##### setIntValues:forParameter:count:
+
+```objc
+- (IOReturn)setIntValues:(unsigned int *)parameterArray
+            forParameter:(IOParameterName)parameterName
+                   count:(unsigned int)count
+```
+
+Handles the `IO_SCSI_CONTROLLER_STATS` parameter, forwarding the handling of all other parameters to super. The `IO_SCSI_CONTROLLER_STATS` parameter resets (using `resetStats`) the standard statistical data kept by this instance.
+
+**See also:** `– getIntValues:forParameter:count:`
+
+##### sumQueueLengths
+
+```objc
+- (unsigned int)sumQueueLengths
+```
+
+Returns zero. Subclasses that support standard statistics should implement this method so that it returns the total number of requests detected in its queue of I/O requests. This number should be reset to 0 when this instance is initialized and when `resetStats` is called. See the class description for more information on supporting standard statistics.
+
+---
+
 ## See Also
 
 - Driver Kit Architecture documentation (Chapter 1)
