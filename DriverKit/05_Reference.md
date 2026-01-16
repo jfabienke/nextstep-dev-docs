@@ -863,6 +863,1314 @@ Must be called after `registerDevice` during initialization.
 
 ---
 
+### IODirectDevice
+
+**Inherits From:** IODevice : Object
+
+**Declared In:** driverkit/IODirectDevice.h
+driverkit/architecture/directDevice.h
+driverkit/architecture/IOPCIDirectDevice.h
+driverkit/architecture/IOPCMCIADirectDevice.h
+
+#### Class Description
+
+IODirectDevice is a device-independent abstract class that is the superclass of all direct device driver classes. Most of the functionality of IODirectDevice is provided by device-dependent categories, which are described in detail below. IODirectDevice provides:
+
+- An implementation of the `deviceStyle` IODevice class method, so IODirectDevice subclasses don't have to override it
+- Methods for getting and setting IODirectDevice information, such as the interrupt port and the IODeviceDescription
+- A default I/O thread that listens for messages to the interrupt port
+- An efficient way to receive messages, to be used by drivers that provide their own I/O thread (see the `waitForInterrupt:` method description)
+
+To use the default I/O thread, subclasses invoke one of the `startIOThread...` methods and implement one or more of the following methods:
+
+- `interruptOccurred` or `interruptOccurredAt:`
+- `timeoutOccurred`
+- `commandRequestOccurred`
+- `otherOccurred:`
+- `receiveMsg`
+
+Each of these methods is invoked when the I/O thread receives a corresponding Mach message on its interrupt port. For example, when the kernel sends an `IO_DEVICE_INTERRUPT_MSG` Mach message to the interrupt port, the I/O thread receives it and invokes `interruptOccurred`. The documentation for `startIOThread` describes in detail how the I/O thread listens for Mach messages and which methods it invokes in response to which Mach messages.
+
+Interrupt messages are the only Mach messages that the kernel automatically sends. If you want to receive other types of Mach messages, your driver or some other module it works with must explicitly send them. For example, if you want your driver's `timeoutOccurred` method to be invoked by the I/O thread, you must ensure that your driver sends an `IO_TIMEOUT_MSG` at some point. Some classes, such as IOEthernet, have this functionality built in. Others, such as IOSCSIController, don't. See the IOSCSIController class description for an example of how to send a message.
+
+##### ISA and EISA IODirectDevices
+
+The IOEISADirectDevice category of IODirectDevice defined in the header file driverkit/i386/directDevice.h provides the following additional functionality for IODirectDevices that control hardware on ISA or EISA Intel-based computers:
+
+- Reserving and releasing ranges of I/O ports
+- Reserving, releasing, enabling, and disabling interrupts (also known as IRQs)
+- A way of providing an interrupt handler, if interrupt messages aren't sufficient
+- Mapping device memory into virtual memory
+- Reserving and releasing DMA channels
+- Starting DMA and dealing with DMA buffers
+- Determining whether the computer has EISA slots
+
+**Note:** The ISA/EISA category works for all hardware attached to ISA and EISA computers--ISA slots, EISA slots, VL-Bus, and so on. Remember that EISA computers can have ISA slots, but ISA computers don't have EISA slots.
+
+I/O ports, interrupts, device memory ranges, and DMA channels are collectively known as resources.
+
+##### PCI IODirectDevices
+
+The IOPCIDirectDevice category of IODirectDevice defined in the header file driverkit/i386/IOPCIDirectDevice.h provides the following additional functionality for IODirectDevices that control hardware on PCI Intel-based computers:
+
+- Indicating whether the PCI bus is enabled or not
+- Reading and writing the device's configuration space
+
+The PCI configuration space is memory available for configuration information for each device. A 256-byte portion is available for each device, addressed by the PCI anchor, which consists of three fields:
+
+- Device number between 0 and 31
+- Function number between 0 and 7
+- Bus number between 0 and 255
+
+Methods can either read or write the entire configuration space or access individual 32-bit pieces, accessing it by a register address--a byte address into the 256-byte portion.
+
+##### PCMCIA IODirectDevices
+
+The IOPCMCIADirectDevice category of IODirectDevice defined in the header file driverkit/i386/IOPCMCIADirectDevice.h provides the following additional functionality for IODirectDevices that control hardware on PCMCIA Intel-based computers:
+
+- Mapping and unmapping attribute memory
+
+Attribute memory resides on the PCMCIA card and contains tuples, i.e., configuration information that's stored on the card. To access attribute memory, you must map the memory using the mapping method; when you've completed your access, you must unmap it with the method provided. If you attempt to map the memory and it's already mapped, the mapping method returns failure status.
+
+##### Local Equivalents of Resources
+
+The ISA/EISA category refers to resources not by their actual numbers or addresses, but by their local equivalent. The local equivalent of a resource is the position (starting at 0) of that resource in the configuration list of all resources of that type.
+
+For example, if a device is configured to have one DMA channel (DMA channel 6, for example), the local equivalent of that channel is 0. If a device is configured to have two DMA channels (specified in order as 4 and 6, for example), then channel 4 has the local equivalent of 0, and channel 6 has the local equivalent of 1.
+
+Similarly, the first range of I/O ports in a device's configuration has the local equivalent of 0, the second range is 1, and so on.
+
+The local equivalent is used in all ISA/EISA methods that refer to DMA channels, specific interrupts, I/O ports, and memory ranges. For example, to enable the first DMA channel in a device's configuration, a driver sends an `enableChannel:` message to self, specifying 0 as the channel.
+
+See Chapter 4 and Chapter 5, "Configuration Keys" in "Other Features" for information on configuration files.
+
+##### Implementing a Subclass
+
+The IODirectDevice methods you must implement in a subclass depend on your driver's capabilities. To start with, you must implement all the methods that IODevice requires, except for `deviceStyle`, which is implemented by IODirectDevice. You must also implement `initFromDeviceDescription:` to perform any driver- or device-specific initialization.
+
+If your device performs DMA, you must implement `startDMAForBuffer:channel:`.
+
+If your device can interrupt, you generally need to implement either `interruptOccurred` (if your device uses only one interrupt) or `interruptOccurredAt:`. If your driver needs to handle some interrupts directly, instead of receiving interrupt notification by Mach messages, you must implement `getHandler:level:argument:forInterrupt:`.
+
+If your driver uses other Mach messages, you might also need to implement `timeoutOccurred`, `commandRequestOccurred`, `otherOccurred:`, or `receiveMsg`.
+
+Most drivers need an I/O thread, as discussed in Chapter 1. All Driver Kit subclasses of IODirectDevice (such as IOEthernet) provide an I/O thread for you, if necessary. However, if your class is a direct subclass of IODirectDevice, you need to provide your own I/O thread. You can do so by invoking one of the `startIOThread...` methods.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Architecture-Independent Methods:**
+
+**Freeing instances**
+- `– free`
+
+**Registering the class**
+- `+ deviceStyle`
+
+**Getting and setting the interrupt port**
+- `– attachInterruptPort`
+- `– interruptPort`
+
+**Handling messages to the interrupt port**
+- `– commandRequestOccurred`
+- `– interruptOccurred`
+- `– interruptOccurredAt:`
+- `– receiveMsg`
+- `– timeoutOccurred`
+- `– waitForInterrupt:`
+
+**Running an I/O thread**
+- `– startIOThread`
+- `– startIOThreadWithPriority:`
+- `– startIOThreadWithFixedPriority:`
+
+**Getting and setting the IODeviceDescription**
+- `– deviceDescription`
+- `– setDeviceDescription:`
+
+**ISA/EISA Architecture Methods:**
+
+**Initializing instances**
+- `– initFromDeviceDescription:`
+
+**Reserving I/O ports**
+- `– reservePortRange:`
+- `– releasePortRange:`
+
+**Dealing with interrupts**
+- `– enableAllInterrupts`
+- `– disableAllInterrupts`
+- `– reserveInterrupt:`
+- `– releaseInterrupt:`
+- `– enableInterrupt:`
+- `– disableInterrupt:`
+- `– getHandler:level:argument:forInterrupt:`
+
+**Mapping memory**
+- `– mapMemoryRange:to:findSpace:cache:`
+- `– unmapMemoryRange:from:`
+
+**Dealing with DMA channels**
+- `– enableChannel:`
+- `– disableChannel:`
+- `– reserveChannel:`
+- `– releaseChannel:`
+
+**Dealing with DMA buffers**
+- `– startDMAForBuffer:channel:`
+- `– createDMABufferFor:length:read:needsLowMemory:limitSize:`
+- `– freeDMABuffer:`
+- `– abortDMABuffer:`
+
+**Setting the DMA mode**
+- `– setTransferMode:forChannel:`
+- `– setAutoinitialize:forChannel:`
+- `– setIncrementMode:forChannel:`
+
+**Using the EISA extended mode register**
+- `– setDMATransferWidth:forChannel:`
+- `– setDMATiming:forChannel:`
+- `– setEOPAsOutput:forChannel:`
+- `– setStopRegisterMode:forChannel:`
+
+**Getting a DMA channel's status**
+- `– currentAddressForChannel:`
+- `– currentCountForChannel:`
+- `– getDMATransferWidth:forChannel:`
+- `– isDMADone:`
+
+**Optional DMA locking**
+- `– reserveDMALock`
+- `– releaseDMALock`
+
+**Getting information about EISA slots**
+- `– isEISAPresent`
+- `– getEISAId:forSlot:`
+
+**PCI Architecture Methods:**
+
+**Determining if PCI bus support is enabled**
+- `+ isPCIPresent`
+- `– isPCIPresent`
+
+**Reading and writing the entire configuration space**
+- `+ getPCIConfigSpace:withDeviceDescription:`
+- `+ setPCIConfigSpace:withDeviceDescription:`
+- `– getPCIConfigSpace:withDeviceDescription:`
+- `– setPCIConfigSpace:withDeviceDescription:`
+
+**Reading and writing the configuration space**
+- `+ getPCIConfigData:atRegister:withDeviceDescription:`
+- `+ setPCIConfigData:atRegister:withDeviceDescription:`
+- `– getPCIConfigData:atRegister:withDeviceDescription:`
+- `– setPCIConfigData:atRegister:withDeviceDescription:`
+
+**PCMCIA Architecture Methods:**
+
+**Managing attribute memory**
+- `– mapAttributeMemoryTo:findSpace:`
+- `– unmapAttributeMemory:`
+
+#### Class Methods
+
+##### deviceStyle
+
+```objc
++ (IODeviceStyle)deviceStyle
+```
+
+Reports the basic style of driver as `IO_DirectDevice`. Because IODirectDevice implements this method, its subclasses don't have to.
+
+**See also:** `+ deviceStyle` (IODevice)
+
+##### isPCIPresent (PCI)
+
+```objc
++ (BOOL)isPCIPresent
+```
+
+Returns YES if PCI Bus support is enabled. Returns NO otherwise.
+
+##### getPCIConfigSpace:withDeviceDescription: (PCI)
+
+```objc
++ (IOReturn)getPCIConfigSpace:(IOPCIConfigSpace *)configurationSpace
+         withDeviceDescription:description
+```
+
+Reads the device's entire configuration space using the IOPCIDeviceDescription *description*. Returns `IO_R_SUCCESS` if successful. If this method fails, the driver should make no assumptions about the state of the data returned in the IOPCIConfigSpace struct.
+
+##### setPCIConfigSpace:withDeviceDescription: (PCI)
+
+```objc
++ (IOReturn)setPCIConfigSpace:(IOPCIConfigSpace *)configurationSpace
+         withDeviceDescription:description
+```
+
+Writes the device's entire configuration space using the IOPCIDeviceDescription *description*. Returns `IO_R_SUCCESS` if successful. If this method fails, the driver should make no assumptions about the state of the device's configuration space.
+
+##### getPCIConfigData:atRegister:withDeviceDescription: (PCI)
+
+```objc
++ (IOReturn)getPCIConfigData:(unsigned long *)data
+                  atRegister:(unsigned char)address
+        withDeviceDescription:description
+```
+
+Reads from the device's configuration space at the byte address *address* using the IOPCIDeviceDescription *description*. All accesses are 32 bits wide and *address* must be aligned as such.
+
+##### setPCIConfigData:atRegister:withDeviceDescription: (PCI)
+
+```objc
++ (IOReturn)setPCIConfigData:(unsigned long)data
+                  atRegister:(unsigned char)address
+        withDeviceDescription:description
+```
+
+Writes to the device's configuration space at the byte address *address* using the IOPCIDeviceDescription *description*. All accesses are 32 bits wide and *address* must be aligned as such.
+
+#### Instance Methods (Architecture-Independent)
+
+##### attachInterruptPort
+
+```objc
+- (IOReturn)attachInterruptPort
+```
+
+Creates the interrupt port, if none exists already, and requests that the interrupt port receive all interrupt messages for the device's reserved interrupts. This method is invoked whenever an interrupt is enabled. Returns `IO_R_SUCCESS` if successful; otherwise, returns `IO_R_NOT_ATTACHED`.
+
+**See also:** `– interruptPort`, `– enableAllInterrupts`
+
+##### commandRequestOccurred
+
+```objc
+- (void)commandRequestOccurred
+```
+
+Does nothing; subclasses can implement this method if desired. This method is invoked by the default I/O thread (implemented by `startIOThread...`) whenever it receives a bodyless message with ID `IO_COMMAND_MSG`. The part of a driver that handles user requests can use this message to notify the I/O thread that it should execute a command that's been placed in global data.
+
+**See also:** `– startIOThread`
+
+##### deviceDescription
+
+```objc
+- deviceDescription
+```
+
+Returns the IODeviceDescription associated with this instance.
+
+**See also:** `– setDeviceDescription:`
+
+##### free
+
+```objc
+- free
+```
+
+Deallocates the IODirectDevice's memory and its interrupt port, if one exists. Returns `nil`.
+
+##### interruptOccurred
+
+```objc
+- (void)interruptOccurred
+```
+
+Invokes `interruptOccurredAt:` with an argument of zero. This method is invoked by the default I/O thread (implemented by `startIOThread...`) whenever it receives a bodyless Mach message with the ID `IO_DEVICE_INTERRUPT_MSG`. Subclasses that support only one interrupt should implement this method so that it processes the hardware interrupt, as described in Chapters 1 and 2.
+
+**See also:** `– interruptOccurredAt:`, `– startIOThread`
+
+##### interruptOccurredAt:
+
+```objc
+- (void)interruptOccurredAt:(int)localInterrupt
+```
+
+Does nothing; subclasses that need to handle interrupts should implement this method so that it processes the hardware interrupt, as described in Chapter 1. This method is invoked by the default I/O thread (implemented by `startIOThread...`) whenever it receives a bodyless Mach message with an ID between `IO_DEVICE_INTERRUPT_MSG_FIRST` and `IO_DEVICE_INTERRUPT_MSG_LAST` (excluding `IO_DEVICE_INTERRUPT_MSG`).
+
+**See also:** `– interruptOccurred`, `– startIOThread`
+
+##### interruptPort
+
+```objc
+- (port_t)interruptPort
+```
+
+Returns the Mach port on which the IODirectDevice should receive interrupt messages. The returned `port_t` is in the context of the kernel I/O task.
+
+**See also:** `– attachInterruptPort`
+
+##### otherOccurred:
+
+```objc
+- (void)otherOccurred:(int)msgID
+```
+
+Does nothing; subclasses can implement this method if desired. This method is invoked by the default I/O thread (implemented by `startIOThread...`) whenever it receives a bodyless message with an unrecognized ID. The ID is given in *msgID*.
+
+**See also:** `– receiveMsg`, `– startIOThread`
+
+##### receiveMsg
+
+```objc
+- (void)receiveMsg
+```
+
+Dequeues the next Mach message from the interrupt port and throws it away; subclasses can implement this method if desired to handle custom messages. This method is invoked by the default I/O thread (implemented by `startIOThread...`) whenever it tries to receive a message that has a body. To implement this message, you need to call `msg_receive()` on the interrupt port. In this sample implementation, fill in the italicized text between angle brackets with device-specific code:
+
+```objc
+- (void)receiveMsg
+{
+    IOReturn        result;
+    port_t          inPort;
+    MyMsg           myMsg;
+    kern_return_t   result;
+
+    inPort = [self interruptPort];
+    if (inPort == PORT_NULL) {
+        /* React to having no interrupt port. */
+        return;
+    }
+
+    myMsg.header.msg_size = sizeof(myMsg);
+    myMsg.header.msg_local_port = inPort;
+
+    result = msg_receive(&myMsg.header, (msg_option_t)RCV_TIMEOUT, 0);
+
+    if (result != RCV_SUCCESS) {
+        IOLog("%s receiveMsg: msg_receive returns %d\n", result);
+        return;
+    }
+    else {
+        switch (myMsg.header.msg_id) {
+            case MyMsg1:
+                [self handleMsg1];
+                break;
+
+            case MyMsg2:
+                [self handleMsg2];
+                break;
+            /* ... */
+        }
+    }
+}
+```
+
+**See also:** `– otherOccurred:`, `– startIOThread`
+
+##### setDeviceDescription:
+
+```objc
+- (void)setDeviceDescription:deviceDescription
+```
+
+Records *deviceDescription* as the IODeviceDescription associated with this instance. ISA/EISA-architecture devices don't need to invoke this method because `initFromDeviceDescription:` already does so.
+
+**See also:** `– deviceDescription`
+
+##### startIOThread
+
+```objc
+- (IOReturn)startIOThread
+```
+
+Invokes `attachInterruptPort` and, if attaching the interrupt port was successful, forks a thread to serve as the instance's I/O thread. This thread, which is appropriate for most drivers, sits in an endless loop that does the following:
+
+1. Waits for a Mach message on the interrupt port by invoking `waitForInterrupt:`
+2. If the message couldn't be dequeued because it was too large, invokes `receiveMsg` so that the subclass can dequeue and handle the message itself
+3. If the message is dequeued successfully, invokes one of five methods, depending on the message ID:
+
+| Message ID | Method Invoked |
+|------------|----------------|
+| `IO_TIMEOUT_MSG` | `timeoutOccurred` |
+| `IO_COMMAND_MSG` | `commandRequestOccurred` |
+| `IO_DEVICE_INTERRUPT_MSG` | `interruptOccurred` |
+| `IO_DEVICE_INTERRUPT_MSG_FIRST` to `IO_DEVICE_INTERRUPT_MSG_LAST` | `interruptOccurredAt:` |
+| (anything else) | `otherOccurred:` |
+
+Returns the value returned by `attachInterruptPort`.
+
+**See also:** `– startIOThreadWithFixedPriority:`, `– startIOThreadWithPriority:`
+
+##### startIOThreadWithFixedPriority:
+
+```objc
+- (IOReturn)startIOThreadWithFixedPriority:(int)priority
+```
+
+The same as `startIOThreadWithPriority:`, except that the I/O thread's priority never lessens due to aging. This method lets you do performance tuning by disabling priority aging.
+
+For more information about scheduling policies and priorities, see Chapter 1 of the NEXTSTEP Operating System Software manual.
+
+**See also:** `– startIOThread`, `– startIOThreadWithPriority:`
+
+##### startIOThreadWithPriority:
+
+```objc
+- (IOReturn)startIOThreadWithPriority:(int)priority
+```
+
+The same as `startIOThread`, except that the I/O thread runs at the specified priority. This method lets you do performance tuning by raising or lowering the thread's scheduling priority. By default, kernel I/O threads start with a priority equal to the maximum user priority (currently 18).
+
+For more information about priorities, see Chapter 1 of the NEXTSTEP Operating System Software manual.
+
+**See also:** `– startIOThread`, `– startIOThreadWithFixedPriority:`
+
+##### timeoutOccurred
+
+```objc
+- (void)timeoutOccurred
+```
+
+Does nothing; subclasses that support timeouts can implement this method. See the IOEthernet class for an example of implementing this method as part of timeout support. This method is invoked by the default I/O thread (implemented by `startIOThread...`) whenever it receives a bodyless Mach message with an ID of `IO_TIMEOUT_MSG`. See the IOSCSIController class for an example of sending Mach messages.
+
+**See also:** `– startIOThread`
+
+##### waitForInterrupt:
+
+```objc
+- (IOReturn)waitForInterrupt:(int *)msgID
+```
+
+Listens to the interrupt port until it detects a Mach message; dequeues the message if possible. This method should be invoked by the I/O thread whenever the thread needs to listen to the interrupt port. The default I/O thread provided by IODirectDevice invokes this message as described under `startIOThread`.
+
+If the interrupt port hasn't been set, this message returns `IO_R_NO_INTERRUPT`. If the message has a body, this method leaves the message on the queue and returns `IO_R_MSG_TOO_LARGE`. If the message couldn't be dequeued due to another reason, this method returns `IO_R_IPC_FAILURE` and logs an error message.
+
+If a message is already on the queue when this method is invoked, this method dequeues the message and then attempts to give up the processor before returning. Without this precaution, a thread with many messages queued could prevent other kernel threads from being executed.
+
+If this method successfully detects and dequeues a message, it sets *msgId* to the message's ID and returns `IO_R_SUCCESS`.
+
+**See also:** `– startIOThread`
+
+#### Instance Methods (ISA/EISA Architecture)
+
+##### initFromDeviceDescription:
+
+```objc
+- initFromDeviceDescription:deviceDescription
+```
+
+Initializes and returns the IODirectDevice instance. Records *deviceDescription* as the IODeviceDescription corresponding to this IODirectDevice. Reserves all the interrupts, DMA channels, and I/O ports specified in *deviceDescription*. If any resources can't be reserved, releases all resources and returns `nil`.
+
+This method must be invoked before any methods that require local equivalents of resources can be used. For example, `mapMemoryRange:...` requires that you specify the local equivalent of a memory range. However, IODirectDevices don't know what memory ranges they can use until `initFromDeviceDescription:` has been invoked. This means, for example, that subclass implementations of `initFromDeviceDescription:` must invoke the superclass's implementation of `initFromDeviceDescription:` before they can map any memory ranges or do anything else that requires access to resources.
+
+##### reservePortRange:
+
+```objc
+- (IOReturn)reservePortRange:(unsigned int)localPortRange
+```
+
+Releases the range of I/O ports corresponding to *localPortRange* and returns `IO_R_SUCCESS`.
+
+You don't normally have to invoke this method, since `initFromDeviceDescription:` reserves all the device's I/O ports.
+
+**See also:** `– releasePortRange:`
+
+##### releasePortRange:
+
+```objc
+- (void)releasePortRange:(unsigned int)localPortRange
+```
+
+Releases the range of I/O ports corresponding to *localPortRange*.
+
+**See also:** `– reservePortRange:`
+
+##### enableAllInterrupts
+
+```objc
+- (IOReturn)enableAllInterrupts
+```
+
+Creates and attaches an interrupt port, if one isn't already attached, and enables all interrupts associated with this IODirectDevice. Returns `IO_R_NO_INTERRUPT` if the interrupt port couldn't be attached; otherwise, returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– attachInterruptPort`, `– disableAllInterrupts`, `– enableInterrupt:`
+
+##### disableAllInterrupts
+
+```objc
+- (void)disableAllInterrupts
+```
+
+Disables all interrupts associated with this IODirectDevice, so that no interrupts can be generated by the hardware. Returns `IO_R_NO_INTERRUPT` if no interrupt port is attached; otherwise, returns `IO_R_SUCCESS`.
+
+**Note:** Even after invoking `disableAllInterrupts:` successfully, your driver may still receive interrupt messages for interrupts that occurred before they were disabled.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– enableAllInterrupts`, `– disableInterrupt:`
+
+##### reserveInterrupt:
+
+```objc
+- (IOReturn)reserveInterrupt:(unsigned int)localInterrupt
+```
+
+Reserves the interrupt corresponding to *localInterrupt* so that no other device can use it. Returns `IO_R_NOT_ATTACHED` if *localInterrupt* doesn't correspond to an interrupt or if another device has already reserved the interrupt. Otherwise, returns `IO_R_SUCCESS`.
+
+You don't normally have to invoke this method, since `initFromDeviceDescription:` reserves all the device's interrupts.
+
+**See also:** `– releaseInterrupt:`
+
+##### releaseInterrupt:
+
+```objc
+- (void)releaseInterrupt:(unsigned int)localInterrupt
+```
+
+Releases the interrupt corresponding to *localInterrupt* so that another device can use the interrupt.
+
+**See also:** `– reserveInterrupt:`
+
+##### enableInterrupt:
+
+```objc
+- (IOReturn)enableInterrupt:(unsigned int)localInterrupt
+```
+
+Invokes `attachInterruptPort` and, if `attachInterruptPort` succeeds, enables the interrupt corresponding to *localInterrupt* and returns `IO_R_SUCCESS`. If `attachInterruptPort` doesn't succeed, returns `IO_R_NOT_ATTACHED`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– disableInterrupt:`, `– enableAllInterrupts`
+
+##### disableInterrupt:
+
+```objc
+- (void)disableInterrupt:(unsigned int)localInterrupt
+```
+
+Disables the interrupt corresponding to *localInterrupt*.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– disableAllInterrupts`, `– enableInterrupt:`
+
+##### getHandler:level:argument:forInterrupt:
+
+```objc
+- (BOOL)getHandler:(IOInterruptHandler *)handler
+             level:(unsigned int *)ipl
+          argument:(unsigned int *)arg
+      forInterrupt:(unsigned int)localInterrupt
+```
+
+Does nothing and returns NO. Subclasses can implement this method to specify a function to directly handle the interrupt specified by *localInterrupt*. This method is invoked every time an interrupt is enabled.
+
+If this method returns YES, interrupts from the device result directly in a call to *handler*, with the driver-dependent argument *arg*, at interrupt level *ipl*. Otherwise, interrupts result in a Mach message to the instance's interrupt port.
+
+If you implement this method, you should use interrupt level 3 (`IPLDEVICE`, as defined in kernserv/i386/spl.h) unless a higher interrupt level is absolutely necessary. Using interrupt levels greater than 3 requires great care and a good grasp of NeXT kernel internals.
+
+**Note:** The interrupt level is different from the interrupt number (which is also known as the IRQ). The kernel handles interrupts on each of the 15 IRQs at an interrupt level between 0 and 7; the default is 3. The interrupt level determines which devices can interrupt; specifically, only devices with an interrupt level higher than the current interrupt level can interrupt. For example, a device that interrupts using IRQ 9 might have a direct interrupt handler that runs at interrupt level 3. While this interrupt handler is running, other devices with handlers that run at interrupt level 3 can't interrupt the CPU.
+
+Here's a typical implementation of this method:
+
+```objc
+- (BOOL)getHandler:(IOEISAInterruptHandler *)handler
+             level:(unsigned int *)ipl
+          argument:(unsigned int *)arg
+      forInterrupt:(unsigned int)localInterrupt
+{
+    *handler = myIntHandler;
+    *ipl = IPLDEVICE;
+    *arg = 0;
+    return YES;
+}
+```
+
+In the example above, `myIntHandler` is the function that handles the interrupt. It might be implemented as follows:
+
+```objc
+static void myIntHandler(void *identity, void *state, unsigned int arg)
+{
+    /* ... Do what we must at interrupt level ... */
+    if (/* I/O thread doesn't need to know about this interrupt */)
+        return;
+
+    /* Forward this to the I/O thread for further handling. */
+    IOSendInterrupt(identity, state, IO_DEVICE_INTERRUPT_MSG);
+}
+```
+
+**See also:** `IOSendInterrupt()`
+
+##### mapMemoryRange:to:findSpace:cache:
+
+```objc
+- (IOReturn)mapMemoryRange:(unsigned int)localMemoryRange
+                        to:(vm_address_t *)destinationAddress
+                 findSpace:(BOOL)findSpace
+                     cache:(IOCache)caching
+```
+
+Maps the device memory corresponding to *localMemoryRange* into the calling task's address space. *localMemoryRange* is the local range number in the device description.
+
+If *findSpace* is TRUE, this method ignores the *destinationAddress* and determines where the mapped memory should go, returning the value in *destinationAddress*. If *findSpace* is FALSE, this method truncates *destinationAddress* to the nearest page boundary, maps the memory to the truncated address, and returns the truncated address.
+
+The *caching* argument determines how the memory is cached. Usually, it should be `IO_WriteThrough`. However, if caching seems to be causing problems, try using `IO_CacheOff` instead.
+
+If *localMemoryRange* doesn't correspond to one of this device's memory ranges, `IO_R_INVALID_ARG` is returned. There must also be more than one I/O port range associated with the device (i.e., `[deviceDescription numPortRanges] > 1`); otherwise `IO_R_INVALID_ARG` is returned. If the mapping couldn't be performed for another reason, `IO_R_NO_SPACE` is returned. If the mapping was successful, returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– unmapMemoryRange:from:`
+
+##### unmapMemoryRange:from:
+
+```objc
+- (void)unmapMemoryRange:(unsigned int)localMemoryRange
+                    from:(vm_address_t)address
+```
+
+Unmaps the device memory corresponding to *localMemoryRange* from the calling task's address space. The value of *address* must be the same as the value returned by the *destinationAddress* argument of `mapMemoryRange:to:findSpace:cache:` for the same *localMemoryRange*.
+
+**See also:** `– mapMemoryRange:to:findSpace:cache:`
+
+##### enableChannel:
+
+```objc
+- (IOReturn)enableChannel:(unsigned int)localChannel
+```
+
+Enables transfers on the DMA channel corresponding to *localChannel*. Returns `IO_R_NOT_ATTACHED` if *localChannel* doesn't correspond to a DMA channel or if the DMA channel isn't reserved by this device. Otherwise, returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– disableChannel:`, `– startDMAForBuffer:channel:`
+
+##### disableChannel:
+
+```objc
+- (void)disableChannel:(unsigned int)localChannel
+```
+
+If the DMA channel corresponding to *localChannel* is reserved by this device, this method disables the channel. You typically disable the channel just before changing its setting. You need to invoke `enableChannel:` once the channel is set up so that transfers can occur.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– enableChannel:`
+
+##### reserveChannel:
+
+```objc
+- (IOReturn)reserveChannel:(unsigned int)localChannel
+```
+
+Reserves the DMA channel corresponding to *localChannel* so that no other device can use the channel. Returns `IO_R_NOT_ATTACHED` if *localChannel* doesn't correspond to a DMA channel or if the DMA channel is reserved by another device. Otherwise, returns `IO_R_SUCCESS`.
+
+You don't normally have to invoke this method, since `initFromDeviceDescription:` reserves all the device's DMA channels.
+
+**See also:** `– releaseChannel:`
+
+##### releaseChannel:
+
+```objc
+- (void)releaseChannel:(unsigned int)localChannel
+```
+
+Releases the DMA channel corresponding to *localChannel* so that another device can use the channel.
+
+**See also:** `– reserveChannel:`
+
+##### startDMAForBuffer:channel:
+
+```objc
+- (IOReturn)startDMAForBuffer:(IOEISADMABuffer)buffer
+                      channel:(unsigned int)localChannel
+```
+
+Begins DMA with *buffer* on the DMA channel specified by *localChannel*, and returns `IO_R_SUCCESS`. DMA isn't started if *localChannel* doesn't correspond to a DMA channel (in which case `IO_R_INVALID_ARG` is returned), if the DMA channel isn't assigned, or if no DMA frames could be allocated (`IO_R_NO_FRAMES` is returned).
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+##### createDMABufferFor:length:read:needsLowMemory:limitSize:
+
+```objc
+- (IOEISADMABuffer)createDMABufferFor:(unsigned int *)physicalAddress
+                               length:(unsigned int)numBytes
+                                 read:(BOOL)isRead
+                       needsLowMemory:(BOOL)lowerMem
+                            limitSize:(BOOL)limitSize
+```
+
+Returns a DMA buffer for the contents of physical memory starting at *physicalAddress* and continuing for *numBytes* bytes. You should specify YES for *isRead* if the data will be read from the device; if the data will be written to the device, specify NO. *lowerMem* should be YES if the transfer must be from or to the first 16MB of physical memory (as required by some ISA devices); otherwise, it should be NO. To limit the size of the transfer to 64KB, specify *limitSize* as YES; otherwise, *limitSize* should be NO.
+
+This method changes the physical address if necessary to accommodate the ISA bus. When the physical address is changed, the data is copied to the new physical address (if the transfer is a write), and the new physical address is returned in *physicalAddress*.
+
+Returns NULL if kernel memory for the buffer couldn't be allocated.
+
+**See also:** `– freeDMABuffer:`
+
+##### freeDMABuffer:
+
+```objc
+- (void)freeDMABuffer:(IOEISADMABuffer)buffer
+```
+
+Completes the transfer associated with *buffer* and frees the buffer. *buffer* should be a value returned by `createDMABufferFor:...`. If `createDMABufferFor:...` changed the physical address and the transfer is a read, this method moves the data from the new physical address to the old one. In other words, any data that's read appears at the address passed to `createDMABufferFor:...` in the *physicalAddress* argument, not at the address returned in *physicalAddress*.
+
+**See also:** `– abortDMABuffer:`, `– createDMABufferFor:length:read:needsLowMemory:limitSize:`
+
+##### abortDMABuffer:
+
+```objc
+- (void)abortDMABuffer:(IOEISADMABuffer)buffer
+```
+
+Frees the memory allocated to *buffer*. If a read transfer is in progress, the data read is lost.
+
+**See also:** `– freeDMABuffer:`
+
+##### setTransferMode:forChannel:
+
+```objc
+- (IOReturn)setTransferMode:(IODMATransferMode)mode
+                 forChannel:(unsigned int)localChannel
+```
+
+Sets the specified channel's transfer mode to *mode*. The new transfer mode stays in effect until this method is invoked again or the computer is rebooted.
+
+If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– setAutoinitialize:forChannel:`, `– setIncrementMode:forChannel:`
+
+##### setAutoinitialize:forChannel:
+
+```objc
+- (IOReturn)setAutoinitialize:(BOOL)flag
+                   forChannel:(unsigned int)localChannel
+```
+
+Sets the specified channel's autoinitialize DMA mode to on if *flag* is YES; otherwise, sets it off. The new autoinitialize mode stays in effect until this method is invoked again or the computer is rebooted. By default, autoinitialize mode is disabled.
+
+If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– setIncrementMode:forChannel:`, `– setTransferMode:forChannel:`
+
+##### setIncrementMode:forChannel:
+
+```objc
+- (IOReturn)setIncrementMode:(IOIncrementMode)mode
+                  forChannel:(unsigned int)localChannel
+```
+
+This method lets the driver specify how the start address and length of its DMA buffers should be interpreted. By default, the increment mode is `IO_Increment`, so each DMA buffer is interpreted so that if the start address is *n* and the length is *m*, the data in addresses *n* through *n + m − 1* are transferred. By setting the increment mode to `IO_Decrement`, however, the driver specifies that the affected addresses should be *n* through *n − m + 1*. The new increment mode is in effect until this method is invoked again or until the computer is rebooted.
+
+If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+**Note:** `IO_Decrement` mode is not currently supported.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– setAutoinitialize:forChannel:`, `– setTransferMode:forChannel:`
+
+##### setDMATransferWidth:forChannel:
+
+```objc
+- (IOReturn)setDMATransferWidth:(IOEISADMATransferWidth)width
+                     forChannel:(unsigned int)localChannel
+```
+
+Makes the specified channel use the specified width for DMA transfers. The width can be 8-bit (`IO_8Bit`), 16-bit (`IO_16BitByteCount`), or 32-bit (`IO_32Bit`). The 16-bit mode requires byte counting, not word counting (which is unsupported). This method is valid only on EISA systems.
+
+If the system is ISA-based, this method does nothing and returns `IO_R_UNSUPPORTED`. If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+##### setDMATiming:forChannel:
+
+```objc
+- (IOReturn)setDMATiming:(IOEISADMATiming)timing
+              forChannel:(unsigned int)localChannel
+```
+
+Makes the specified channel use the specified DMA bus cycle--ISA-compatible (`IO_Compatible`), Type A (`IO_TypeA`), Type B (`IO_TypeB`), or burst (`IO_Burst`), which is also known as Type C. This method is valid only on EISA systems.
+
+If the system is ISA-based, this method does nothing and returns `IO_R_UNSUPPORTED`. If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+##### setEOPAsOutput:forChannel:
+
+```objc
+- (IOReturn)setEOPAsOutput:(BOOL)flag
+                forChannel:(unsigned int)localChannel
+```
+
+Selects whether the specified channel's EOP pin is an output signal (the default) or an input signal. This method is valid only on EISA systems.
+
+If the system is ISA-based, this method does nothing and returns `IO_R_UNSUPPORTED`. If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+##### setStopRegisterMode:forChannel:
+
+```objc
+- (IOReturn)setStopRegisterMode:(IOEISAStopRegisterMode)mode
+                     forChannel:(unsigned int)localChannel
+```
+
+Enables or disables the specified channel's Stop register. By default, the Stop register is disabled. You can enable it by specifying *mode* to be `IO_StopRegisterEnable`. This method is valid only on EISA systems.
+
+**Note:** Enabling the Stop register isn't currently supported.
+
+If the system is ISA-based or *mode* is `IO_StopRegisterEnable`, this method does nothing and returns `IO_R_UNSUPPORTED`. If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+##### currentAddressForChannel:
+
+```objc
+- (unsigned int)currentAddressForChannel:(unsigned int)localChannel
+```
+
+Returns the physical address currently in the address register of the specified DMA channel. This method can be invoked at any time--even when DMA is in progress. This method is often used along with autoinitialize mode. It's also used to help diagnose errors when a device or channel aborts a DMA transfer.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– currentCountForChannel:`, `– setAutoinitialize:forChannel:`
+
+##### currentCountForChannel:
+
+```objc
+- (unsigned int)currentCountForChannel:(unsigned int)localChannel
+```
+
+Returns the number of bytes remaining to be transferred on the specified channel. The maximum number returned is equal to the length of the DMA buffer currently being handled by the channel. This method is often used along with autoinitialize mode. It's also used to help diagnose errors when a device or channel aborts a DMA transfer.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– currentAddressForChannel:`, `– setAutoinitialize:forChannel:`
+
+##### getDMATransferWidth:forChannel:
+
+```objc
+- (IOReturn)getDMATransferWidth:(IOEISADMATransferWidth *)width
+                     forChannel:(unsigned int)localChannel
+```
+
+Returns in *width* the width currently used for DMA transfers on the specified channel. The width can be 8-bit (`IO_8Bit`), 16-bit (`IO_16BitByteCount`), or 32-bit (`IO_32Bit`). On EISA systems, you can set the width using `setDMATransferWidth:forChannel:`.
+
+If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`. If the DMA channel isn't reserved by this device, this method does nothing and returns `IO_R_NOT_ATTACHED`. Otherwise, this method returns `IO_R_SUCCESS`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+**See also:** `– setDMATransferWidth:forChannel:`
+
+##### isDMADone:
+
+```objc
+- (BOOL)isDMADone:(unsigned int)localChannel
+```
+
+Returns YES if DMA has completed on the specified channel; otherwise, returns NO. If *localChannel* doesn't correspond to a DMA channel, this method does nothing and returns `IO_R_INVALID_ARG`.
+
+Because this method uses a local equivalent of a resource, it can't be invoked until after this category's implementation of `initFromDeviceDescription:` is invoked.
+
+##### reserveDMALock
+
+```objc
+- (void)reserveDMALock
+```
+
+Reserves the lock associated with DMA. See `releaseDMALock` for information on DMA locking.
+
+##### releaseDMALock
+
+```objc
+- (void)releaseDMALock
+```
+
+Releases the lock associated with DMA. This method panics if this IODirectDevice doesn't hold the DMA lock.
+
+Most drivers don't need to use DMA locking. However, the floppy drive (and possibly other devices) tends to have DMA underruns when the bus is saturated. As a result, the floppy driver and drivers for devices that tend to saturate the bus use DMA locking to avoid performing I/O at the same time. DMA locking is ignored by all other device drivers.
+
+You don't have to use DMA locking unless your device is having DMA underruns or is causing another device to have underruns. Sometimes these underruns occur on ISA computers, but not EISA ones. If your device is causing the floppy drive to have underruns, you'll see the following error on the console while your device is performing I/O:
+
+```
+fd0: DMA Over/underrun
+```
+
+**See also:** `– reserveDMALock`
+
+##### isEISAPresent
+
+```objc
+- (BOOL)isEISAPresent
+```
+
+Returns YES if the computer conforms to the EISA specification; otherwise, returns NO.
+
+**See also:** `– getEISAId:forSlot:`
+
+##### getEISAId:forSlot:
+
+```objc
+- (BOOL)getEISAId:(unsigned int *)id
+          forSlot:(int)slotNumber
+```
+
+Returns in *id* the EISA id for the specified slot. Returns YES if the slot is a valid EISA slot; otherwise, returns NO. You can use this method to loop through the computer's slots, testing each slot for whether it contains a particular card. For example, the following code is executed in the QVision display driver's `initFromDeviceDescription:` method to determine whether QVision hardware is present in the system:
+
+```objc
+adapter = UnknownAdapter;
+for (slot = 1; slot <= 0xF; slot++) {
+    if ([self getEISAId:&product_id forSlot:slot] == YES) {
+        switch (product_id) {
+            case QVISION_EISA_ID:
+                adapter = QVisionAdapter;
+                break;
+            case ORION_EISA_ID:
+                adapter = OrionAdapter;
+                break;
+            case ORION12_EISA_ID:
+                adapter = Orion12Adapter;
+                break;
+            case QVISION_ISA_ID:
+            case ORION_ISA_ID:
+            case ORION12_ISA_ID:
+                IOLog("%s: Sorry, ISA cards are not supported.\n",
+                    [self name]);
+                break;
+        }
+        break;
+    }
+}
+```
+
+**See also:** `– isEISAPresent`
+
+#### Instance Methods (PCI Architecture)
+
+##### isPCIPresent
+
+```objc
+- (BOOL)isPCIPresent
+```
+
+Returns YES if PCI Bus support is enabled. Returns NO otherwise.
+
+##### getPCIConfigSpace:
+
+```objc
+- (IOReturn)getPCIConfigSpace:(IOPCIConfigSpace *)configurationSpace
+```
+
+Reads the device's entire configuration space. Returns `IO_R_SUCCESS` if successful. If this method fails, the driver should make no assumptions about the state of the data returned in the IOPCIConfigSpace struct.
+
+##### setPCIConfigSpace:
+
+```objc
+- (IOReturn)setPCIConfigSpace:(IOPCIConfigSpace *)configurationSpace
+```
+
+Writes the device's entire configuration space. Returns `IO_R_SUCCESS` if successful. If this method fails, the driver should make no assumptions about the state of the device's configuration space.
+
+##### getPCIConfigData:atRegister:
+
+```objc
+- (IOReturn)getPCIConfigData:(unsigned long *)data
+                  atRegister:(unsigned char)address
+```
+
+Reads from the device's configuration space at the byte address *address*. All accesses are 32 bits wide and *address* must be aligned as such.
+
+##### setPCIConfigData:atRegister:
+
+```objc
+- (IOReturn)setPCIConfigData:(unsigned long)data
+                  atRegister:(unsigned char)address
+```
+
+Writes to the device's configuration space at the byte address *address*. All accesses are 32 bits wide and *address* must be aligned as such.
+
+#### Instance Methods (PCMCIA Architecture)
+
+##### mapAttributeMemoryTo:findSpace:
+
+```objc
+- (IOReturn)mapAttributeMemoryTo:(vm_address_t *)destinationAddress
+                       findSpace:(BOOL)findSpace
+```
+
+Maps attribute memory to *destinationAddress* in *findSpace*.
+
+**See also:** `– unmapAttributeMemory:`
+
+##### unmapAttributeMemory:
+
+```objc
+- (void)unmapAttributeMemory
+```
+
+Unmaps attribute memory.
+
+**See also:** `– mapAttributeMemoryTo:findSpace:`
+
+---
+
+### IODisplayInspector
+
+**Inherits From:** IODeviceInspector : Object
+
+**Conforms To:** IOConfigurationInspector
+
+**Declared In:** driverkit/IODisplayInspector.h
+
+#### Class Description
+
+This class provides inspectors used by the Configure application for all displays. It provides an accessory View to IODeviceInspector that displays the current display mode and has a button. When the button is clicked, the IODisplayInspector puts up a panel that lets the user select the display mode for the device.
+
+The panel shows all display modes specified for the "DisplayModes" key in the driver bundle's Language.lproj/Localizable.strings file. The mode that's selected is placed in the device's Instancen.table file as the value of the "Display Mode" key.
+
+#### Instance Variables
+
+```objc
+id displayAccessoryHolder;
+id displayMode;
+id panel;
+id modes;
+id okButton;
+id selectButton;
+id modeText;
+IODisplayMode *modeRecs;
+unsigned int modeCount;
+```
+
+**displayAccessoryHolder** – The View where the display inspector's own accessory View (as opposed to the IODeviceInspector's accessory View) is placed
+
+**displayMode** – The accessory View provided to the IODeviceInspector
+
+**panel** – The Select Display Mode panel
+
+**modes** – The DBTableView where valid display modes are listed and can be selected
+
+**okButton** – The OK button in panel
+
+**selectButton** – The Select button in displayMode
+
+**modeText** – The text in displayMode that shows the current display mode
+
+**modeRecs** – An array of IODisplayModes, initialized during `setTable:` with the modes specified in the device's Default.table
+
+**modeCount** – The number of IODisplayModes in modeRecs
+
+#### Method Types
+
+**Initializing the IODisplayInspector**
+- `– init`
+
+**Setting attributes**
+- `– setAccessoryView:`
+- `– setTable:`
+
+**Displaying the Select Display Mode panel**
+- `– runPanel:`
+- `– panelDone:`
+
+**Target and Action methods**
+- `– cancel:`
+- `– doubleClicked:`
+
+#### Instance Methods
+
+##### cancel:
+
+```objc
+- cancel:sender
+```
+
+Exits the Select Display Modes panel without changing the current display mode. Returns `self`.
+
+**See also:** `– runPanel:`
+
+##### doubleClicked:
+
+```objc
+- doubleClicked:sender
+```
+
+Clicks the OK button in the Select Display Modes panel. This method is invoked when the user double-clicks an item in the display modes DBTableView. Returns `self`.
+
+**See also:** `– panelDone:`
+
+##### init
+
+```objc
+- init
+```
+
+Initializes and returns a newly allocated IODisplayInspector. Returns `nil` and frees itself if an error occurs.
+
+##### panelDone:
+
+```objc
+- panelDone:sender
+```
+
+Dismisses the Select Display Modes panel. This method is invoked when the user clicks the panel's OK button. Returns `self`.
+
+**See also:** `– runPanel:`
+
+##### runPanel:
+
+```objc
+- runPanel:sender
+```
+
+Runs the Select Display Modes panel in a modal loop. Before displaying the panel, this method reads the supported display modes from the driver bundle's Localizable.strings file, puts the modes in the panel's DBTableView, and selects the current mode. When the user clicks the Cancel or OK button the loop is broken, the panel is hidden, and, if the button was OK, the new display mode is written to the driver's configuration table. Returns `self`.
+
+**See also:** `– cancel:`, `– panelDone:`
+
+##### setAccessoryView:
+
+```objc
+- setAccessoryView:aView
+```
+
+Sets the IODisplayInspector's accessory View to *aView*. Because IODisplayInspector's inspector View is implemented as IODeviceInspector's accessory View, *aView* is an accessory View within an accessory View. Use this method to add a device-specific View to the inspector. Returns `self`.
+
+##### setTable:
+
+```objc
+- setTable:(NXStringTable *)instanceTable
+```
+
+Specifies *instanceTable* as the configuration table associated with this device and uses the value of *instanceTable's* "Display Mode" key to initialize the display modes for this device. The data in *instanceTable* is written out to its corresponding file (Instancen.table) when the user saves the configuration.
+
+The Configure application invokes this method whenever the user selects this device for inspection. Returns `self`.
+
+---
+
+### IOEISADeviceDescription
+
+**Inherits From:** IODeviceDescription : Object
+
+**Declared In:** driverkit/i386/IOEISADeviceDescription.h
+
+#### Class Description
+
+IOEISADeviceDescriptions encapsulate information about IODirectDevices that run on ISA- and EISA-compliant computers. Usually, you need only to pass around IOEISADeviceDescription objects, without creating them, subclassing them, or sending messages to them. IOEISADeviceDescriptions are created by the system and initialized from IOConfigTables. They are then passed to the `probe:` method to instantiate the driver, using the device description.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Getting and setting the list of DMA channels**
+- `– channel`
+- `– channelList`
+- `– numChannels`
+- `– setChannelList:num:`
+
+**Getting and setting the list of I/O port ranges**
+- `– portRangeList`
+- `– numPortRanges`
+- `– setPortRangeList:num:`
+
+**Getting the EISA slot number and ID**
+- `– getEISASlotNumber`
+- `– getEISASlotID`
+
+#### Instance Methods
+
+##### channel
+
+```objc
+- (unsigned int)channel
+```
+
+Returns the first DMA channel associated with this device. The return value is undefined if this device has no DMA channels associated with it.
+
+**See also:** `– channelList`, `– numChannels`, `– setChannelList:num:`
+
+##### channelList
+
+```objc
+- (unsigned int *)channelList
+```
+
+Returns all the DMA channels associated with this device. You can get the number of items in the returned array by invoking `numChannels`. You should never free the data returned by this method.
+
+**See also:** `– channel`, `– numChannels`, `– setChannelList:num:`
+
+##### getEISASlotID
+
+```objc
+- (IOReturn)getEISASlotID:(unsigned long *)slotID
+```
+
+Returns the EISA slot identifier for the device. In this identifier, the device ID is in the lower 16 bits, and the vendor ID is in the upper 16 bits.
+
+##### getEISASlotNumber
+
+```objc
+- (IOReturn)getEISASlotNumber:(unsigned int *)slotNumber
+```
+
+Returns the EISA slot number for the device.
+
+##### numChannels
+
+```objc
+- (unsigned int)numChannels
+```
+
+Returns the total number of DMA channels associated with this device. This number is determined from the IOConfigTable from which this IOEISADeviceDescription is initialized.
+
+**See also:** `– channel`, `– channelList`, `– setChannelList:num:`
+
+##### numPortRanges
+
+```objc
+- (unsigned int)numPortRanges
+```
+
+Returns the total number of I/O port ranges associated with this device.
+
+##### portRangeList
+
+```objc
+- (IORange *)portRangeList
+```
+
+Returns all the I/O port ranges associated with this device. You can get the number of items in the returned array by invoking `numPortRanges`. You should never free the data returned by this method.
+
+**See also:** `– numPortRanges`, `– setPortRangeList:num:`
+
+##### setChannelList:num:
+
+```objc
+- (IOReturn)setChannelList:(unsigned int *)aList
+                       num:(unsigned int)numChannels
+```
+
+Sets the array and number of DMA channels associated with this device. You shouldn't normally invoke this method, since it overrides the normal configuration scheme (which is documented in Chapter 4).
+
+**See also:** `– channel`, `– channelList`, `– numChannels`
+
+##### setPortRangeList:num:
+
+```objc
+- (IOReturn)setPortRangeList:(IORange *)aList
+                         num:(unsigned int)numPortRanges
+```
+
+Sets the array and number of I/O port ranges associated with this device. You shouldn't normally invoke this method, since it overrides the normal configuration scheme (which is documented in Chapter 4).
+
+**See also:** `– numPortRanges`, `– portRangeList`
+
+---
+
 ## See Also
 
 - Driver Kit Architecture documentation (Chapter 1)
