@@ -4879,6 +4879,1382 @@ This function is used to obtain the kernel's `vm_task_t`, which is the `vm_task_
 
 ---
 
+## Protocols
+
+### IOConfigurationInspector
+
+**Adopted By:** IODeviceInspector class, IODisplayInspector class
+
+**Declared In:** driverkit/IODeviceInspector.h
+
+#### Protocol Description
+
+The IOConfigurationInspector protocol is adopted by inspectors that are loaded into the Configure application. Each inspector lets the user inspect and set information about a device, such as a specific brand of Ethernet card. The inspector stores this information in an NXStringTable that is specified to the inspector with the `setTable:` method.
+
+The default, customizable inspector implemented by the IODeviceInspector class is sufficient for many devices. However, if IODeviceInspector doesn't suit your configuration needs, you should implement your own inspector class that adopts the IOConfigurationInspector protocol. An example of adopting this protocol is under `/NextLibrary/Documentation/NextDev/Examples/DriverKit` in the DriverInspector directory.
+
+#### Method Types
+
+**Get the inspector's View**
+- `– inspectionView`
+
+**Notify that resources have changed**
+- `– resourcesChanged:`
+
+**Set the description table**
+- `– setTable:`
+
+#### Instance Methods
+
+##### inspectionView
+
+```objc
+- (View *)inspectionView
+```
+
+Returns the View of the inspector.
+
+##### resourcesChanged:
+
+```objc
+- resourcesChanged:(IOResources *)resources
+```
+
+The Configure application sends this message to all inspectors whenever an interrupt, DMA channel, I/O port, or memory range is chosen or dropped in any inspector. This method should check for conflicts and update the UI.
+
+This message is sent as often as you might need it, including immediately after a `setTable:` and after your own changes. You are guaranteed to be deactivated before your current table is freed, but you will not receive a `setTable:nil`, so don't count on accessing or modifying the table except in response to a user action.
+
+##### setTable:
+
+```objc
+- setTable:(NXStringTable *)anObject
+```
+
+Sets the NXStringTable describing the inspector's device to *anObject*. You should update the UI when `setTable:` gives you a table to inspect. Your object should keep a handle to the table. When the user makes changes, immediately update the table; do not use OK/Revert buttons.
+
+---
+
+### IOEventThread
+
+**Adopted By:** The event system
+
+**Declared In:** driverkit/eventProtocols.h
+
+#### Protocol Description
+
+The IOEventThread protocol provides access to the event system's I/O thread. You can obtain an IOEventThread-compliant object from IOEventSource's `owner` method.
+
+#### Method Types
+
+**Sending messages**
+- `– sendIOThreadAsyncMsg:to:with:`
+- `– sendIOThreadMsg:to:with:`
+
+#### Instance Methods
+
+##### sendIOThreadAsyncMsg:to:with:
+
+```objc
+- (IOReturn)sendIOThreadAsyncMsg:(id)instance
+                              to:(SEL)selector
+                            with:(id)data
+```
+
+From the event system's I/O thread, sends the message specified by *selector* to *instance*, with the argument *data*. This method doesn't wait for the selector method to be called, and doesn't detect whether *selector* is a valid method of *instance*. Returns `IO_R_IPC_FAILURE` if an error occurred; otherwise, returns `IO_R_SUCCESS`.
+
+**See also:** `– sendIOThreadMsg:to:with:`
+
+##### sendIOThreadMsg:to:with:
+
+```objc
+- (IOReturn)sendIOThreadMsg:(id)instance
+                         to:(SEL)selector
+                       with:(id)data
+```
+
+From the event system's I/O thread, sends the message specified by *selector* to *instance*, with the argument *data*. This method waits until the selector method has returned. Returns `IO_R_IPC_FAILURE` if the message couldn't be sent; otherwise, returns `IO_R_SUCCESS`.
+
+**See also:** `– sendIOThreadAsyncMsg:to:with:`
+
+---
+
+### IONetworkDeviceMethods
+
+**Adopted By:** IOEthernet, IOTokenRing
+
+**Declared In:** driverkit/IONetwork.h
+
+#### Protocol Description
+
+This protocol must be implemented by network direct device drivers that use IONetwork to tie into the kernel network system. These methods are invoked by IONetwork objects in response to events in the network system.
+
+**Note:** Network drivers must run at kernel level.
+
+#### Method Types
+
+**Creating netbufs**
+- `– allocateNetbuf`
+
+**Initializing the hardware**
+- `– finishInitialization`
+
+**Sending out a packet**
+- `– outputPacket:address:`
+
+**Performing control commands**
+- `– performCommand:data:`
+
+#### Instance Methods
+
+##### allocateNetbuf
+
+```objc
+- (netbuf_t)allocateNetbuf
+```
+
+This method creates and returns a netbuf to be used for an impending output.
+
+This method doesn't always have to return a buffer. For example, you might want to limit the number of buffers your driver instance can allocate (say, 200 kilobytes worth) so that it won't use too much wired-down kernel memory. When this method fails to return a buffer, it should return `NULL`.
+
+Here's an example of implementing `allocateNetbuf`:
+
+```objc
+#define my_HDR_SIZE    14
+#define my_MTU        1500
+#define my_MAX_PACKET  (my_HDR_SIZE + my_MTU)
+
+- netbuf_t allocateNetbuf
+{
+    if (_numbufs == _maxNumbufs)
+        return(NULL);
+    else {
+        _numbufs++;
+        return(nb_alloc(my_MAX_PACKET));
+    }
+}
+```
+
+**See also:** `nb_alloc()` (NEXTSTEP Operating System Software)
+
+##### finishInitialization
+
+```objc
+- (int)finishInitialization
+```
+
+This method should perform any initialization that hasn't already been done. For example, it should make sure its hardware is ready to run. You can specify what the integer return value (if any) should be.
+
+If you implement this method, you need to check that `[self isRunning] == YES`.
+
+##### outputPacket:address:
+
+```objc
+- (int)outputPacket:(netbuf_t)packet address:(void *)address
+```
+
+This method should deliver the specified packet to the given address. Its return value should be zero if no error occurred; otherwise, return an error number from the header file `sys/errno.h`.
+
+If you implement this method, you need to check that `[self isRunning] == YES`. If so, insert the necessary hardware addresses into the packet and check it for minimum length requirements.
+
+##### performCommand:data:
+
+```objc
+- (int)performCommand:(const char *)command data:(void *)data
+```
+
+This method performs arbitrary control operations; the character string *command* is used to select between these operations. Although you don't have to implement any operations, there are five standard operations. You can also define your own operations.
+
+The standard commands are listed in the following table. The constant strings listed below are declared in the header file `net/netif.h` (under the bsd directory of `/NextDeveloper/Headers`).
+
+| Command | Operation |
+|---------|-----------|
+| `IFCONTROL_SETFLAGS` | Request to have interface flags turned on or off. The data argument for this command is of type `union ifr_ifru` (which is declared in the header file `net/if.h`). |
+| `IFCONTROL_SETADDR` | Set the address of the interface. |
+| `IFCONTROL_GETADDR` | Get the address of the interface. |
+| `IFCONTROL_AUTOADDR` | Automatically set the address of the interface. |
+| `IFCONTROL_UNIXIOCTL` | Perform a UNIX `ioctl()` command. This is only for compatibility; `ioctl()` isn't a recommended interface for network drivers. The argument is of type `if_ioctl_t *`, where the `if_ioctl_t` structure contains the UNIX ioctl request (for example, `SIOCSIFADDR`) in the `ioctl_command` field and the ioctl data in the `ioctl_data` field. |
+
+An example of implementing `performCommand:data:` follows:
+
+```objc
+- (int)performCommand:(const char *)command data:(void *)data
+{
+    int error = 0;
+
+    if (strcmp(command, IFCONTROL_SETFLAGS) == 0)
+        /* do nothing */;
+    else
+    if (strcmp(command, IFCONTROL_GETADDR) == 0)
+        bcopy(&my_address, data, sizeof (my_address));
+    else
+        error = EINVAL;
+
+    return (error);
+}
+```
+
+---
+
+### IOScreenEvents
+
+**Adopted By:** IODisplay
+
+**Declared In:** driverkit/eventProtocols.h
+
+#### Protocol Description
+
+The methods in this protocol are invoked by the event system, at the request of the Window Server or of pointer management software.
+
+#### Method Types
+
+**Manipulating the cursor**
+- `– hideCursor:`
+- `– moveCursor:frame:token:`
+- `– showCursor:frame:token:`
+
+**Get the device port**
+- `– devicePort`
+
+**Set screen brightness**
+- `– setBrightness:token:`
+
+#### Instance Methods
+
+##### devicePort
+
+```objc
+- (port_t)devicePort
+```
+
+Returns the device port, which should be obtained from this instance's IODeviceDescription.
+
+##### hideCursor:
+
+```objc
+- hideCursor:(int)token
+```
+
+Removes the cursor from the screen.
+
+##### moveCursor:frame:token:
+
+```objc
+- moveCursor:(Point *)cursorLoc
+       frame:(int)frame
+       token:(int)token
+```
+
+Removes the cursor from the screen, moves it, and displays the cursor in its new position.
+
+##### setBrightness:token:
+
+```objc
+- setBrightness:(int)level token:(int)token
+```
+
+Sets the brightness of the screen. Many devices (and thus many drivers) don't permit this operation.
+
+**See also:** `– setBrightness:token:` (IOFrameBufferDisplay class)
+
+##### showCursor:frame:token:
+
+```objc
+- showCursor:(Point *)cursorLocation
+       frame:(int)frame
+       token:(int)token
+```
+
+Displays the cursor at *cursorLocation*.
+
+---
+
+### IOScreenRegistration
+
+**Adopted By:** The event system
+
+**Declared In:** driverkit/eventProtocols.h
+
+#### Protocol Description
+
+Display drivers use the messages in the IOScreenRegistration protocol to register and unregister themselves with the event system. These methods are called by IODisplay in response to a `getIntValues:forParameter:count:` call that specifies the "IO_Framebuffer_Register" parameter.
+
+You shouldn't need to invoke the methods in this protocol, because they're already invoked automatically by IOFrameBufferDisplay and IOSVGADisplay.
+
+#### Instance Methods
+
+##### registerScreen:bounds:shmem:size:
+
+```objc
+- (int)registerScreen:(id)instance
+               bounds:(Bounds *)bounds
+                shmem:(void **)address
+                 size:(int *)num
+```
+
+Registers *instance* as a display driver. Returns a token that's used to refer to the display in other calls to the event system.
+
+##### unregisterScreen:
+
+```objc
+- (void)unregisterScreen:(int)token
+```
+
+Unregisters the instance associated with *token* as a display driver.
+
+---
+
+### IOSCSIControllerExported
+
+**Adopted By:** IOSCSIController class
+
+**Declared In:** driverkit/scsiTypes.h
+
+#### Protocol Description
+
+Indirect device drivers for devices attached to SCSI controllers use the methods in this protocol to communicate with IOSCSIController.
+
+#### Method Types
+
+**Allocating well-aligned buffers**
+- `– allocateBufferOfLength:actualStart:actualLength:`
+- `– getDMAAlignment:`
+
+**Requesting I/O**
+- `– executeRequest:buffer:client:`
+- `– maxTransfer`
+
+**Reserving SCSI targets**
+- `– reserveTarget:lun:forOwner:`
+- `– releaseTarget:lun:forOwner:`
+
+**Resetting the SCSI bus**
+- `– resetSCSIBus`
+
+**Getting the IOReturn equivalent of a sc_status_t value**
+- `– returnFromScStatus:`
+
+#### Instance Methods
+
+##### allocateBufferOfLength:actualStart:actualLength:
+
+```objc
+- (void *)allocateBufferOfLength:(unsigned)length
+                     actualStart:(void **)actualStart
+                    actualLength:(unsigned *)actualLength
+```
+
+Allocates and returns a pointer to some well-aligned memory. Well-aligned memory is necessary for calls to `executeRequest:buffer:client:`. You should use *actualStart* and *actualLength* when freeing the memory, as follows:
+
+```objc
+dataBuffer = [_controller allocateBufferOfLength:block_size
+                                     actualStart:&freePtr
+                                    actualLength:&freeLength];
+/* Use the buffer... */
+IOFree(freePtr, freeLength);
+```
+
+Here's a typical use of this method:
+
+```objc
+IODMAAlignment    dmaAlign;
+unsigned int      alignment, alignedLength, freeLength;
+void             *alignedPtr = NULL;
+unsigned int      maxLength; /* Max length of the current transfer */
+/* . . . */
+[_controller getDMAAlignment:&dmaAlign];
+if(/* we're doing a write */)
+    alignment = dmaAlign.writeLength;
+else
+    alignment = dmaAlign.readLength;
+
+if(alignment > 1)
+    alignedLength = IOAlign(unsigned int, maxLength, alignment);
+else
+    alignedLength = maxLength;
+
+alignedPtr = [_controller allocateBufferOfLength:alignedLength
+                                     actualStart:&freePtr
+                                    actualLength:&freeLength];
+
+/* If we're going to do a write, copy the data to alignedPtr.
+   Set up the request and submit it, as described in the
+   executeRequest:buffer:client: description. */
+/* Do any post-I/O processing that's necessary. */
+
+IOFree(freePtr, freeLength);
+```
+
+**See also:** `– getDMAAlignment:`
+
+##### executeRequest:buffer:client:
+
+```objc
+- (sc_status_t)executeRequest:(IOSCSIRequest *)scsiRequest
+                       buffer:(void *)buffer
+                       client:(vm_task_t)client
+```
+
+Executes the specified request. Indirect devices invoke this method whenever they need the IOSCSIController to perform I/O.
+
+Subclasses of IOSCSIController must implement this method. A typical implementation of this method consists of the following:
+
+1. Using `IOScheduleFunc()` to schedule a timeout function to be called after `scsiRequest->timeoutLength` time has elapsed without I/O completion
+2. Sending the command descriptor block (CDB) specified in *scsiRequest* to the controller
+3. When the I/O has completed, unscheduling the timeout function
+
+This method should return `scsiRequest->driverStatus`, which should be set by the part of the driver that detected I/O completion or timeout.
+
+Indirect devices use this method as shown below:
+
+```objc
+void             *alignedPtr = NULL;
+unsigned int      alignedLength;
+IOSCSIRequest     request;
+cdb_t             cdb;
+
+/* . . . */
+if (/* we're going to be doing DMA */) {
+    /* Ensure we have a well-aligned buffer that starts at alignedPtr
+       and continues for alignedLength bytes.  See the
+       allocateBuffer: description for one way of doing this. */
+} else {
+    alignedLength = 0;
+    alignedPtr = 0;
+}
+
+bzero(&request, sizeof(request));
+request.target = [self target];
+request.lun    = [self lun];
+request.read = /* YES if this is a read; NO otherwise */;
+request.maxTransfer = alignedLength;
+request.timeoutLength = /* some timeout length, in seconds */;
+request.disconnect = /* 1 if allowed to disconnect; otherwise 0 */;
+request.cdb = cdb;
+/* Set up the cdb (command descriptor block) field. The type of this
+   field, cdb_t, is defined and described in the header file
+   bsd/dev/scsireg.h. */
+
+rtn = [_controller executeRequest:&request
+                           buffer:alignedPtr
+                           client:IOVmTaskSelf()];
+```
+
+##### getDMAAlignment:
+
+```objc
+- (void)getDMAAlignment:(IODMAAlignment *)alignment
+```
+
+Returns the DMA alignment requirements for the current architecture. IOSCSIController subclasses can override this method to specify any device-specific alignment requirements. See the description of `allocateBufferOfLength:actualStart:actualLength:` for an example of using this method.
+
+**See also:** `– allocateBufferOfLength:actualStart:actualLength:`
+
+##### maxTransfer
+
+```objc
+- (unsigned)maxTransfer
+```
+
+Returns the maximum number of bytes per DMA transfer. This is the maximum transfer that can be requested in a call to `executeRequest:buffer:client:`.
+
+##### releaseTarget:lun:forOwner:
+
+```objc
+- (void)releaseTarget:(unsigned char)target
+                  lun:(unsigned char)lun
+             forOwner:owner
+```
+
+Releases the specified target/lun pair. If *owner* hasn't reserved the pair, this method uses `IOLog` to print an error message.
+
+**See also:** `– reserveTarget:lun:forOwner:`
+
+##### reserveTarget:lun:forOwner:
+
+```objc
+- (int)reserveTarget:(unsigned char)target
+                 lun:(unsigned char)lun
+            forOwner:owner
+```
+
+Reserves the specified target/lun pair, if it isn't already reserved. This method is invoked by a client (for example, a SCSIDisk instance) to mark a particular target/lun as being in use by that client. Usually, this happens at `probe:` time; however, the SCSIGeneric driver uses this method at other times.
+
+This method returns a nonzero value if the target/lun pair is already reserved. Otherwise, it returns zero.
+
+**See also:** `– releaseTarget:lun:forOwner:`
+
+##### resetSCSIBus
+
+```objc
+- (sc_status_t)resetSCSIBus
+```
+
+Resets the SCSI bus. Subclasses of IOSCSIController must implement this method so that it resets the SCSI bus. The `sc_status_t` enumerated type is defined and described in the header file `bsd/dev/scsireg.h`.
+
+##### returnFromScStatus:
+
+```objc
+- (IOReturn)returnFromScStatus:(sc_status_t)sc_status
+```
+
+Returns the IOReturn value corresponding to the specified `sc_status_t` value. The `sc_status_t` enumerated type is defined and described in the header file `bsd/dev/scsireg.h`.
+
+---
+
+## Types and Constants
+
+This section describes the types and constants defined by the Driver Kit.
+
+### Defined Types
+
+#### IOAddressRange
+
+**Declared In:** driverkit/IODeviceInspector.h
+
+**Synopsis:**
+
+```c
+typedef struct IOAddressRange {
+    unsigned    start;
+    unsigned    length;
+} IOAddressRange;
+```
+
+**Description:** Used to describe address ranges.
+
+---
+
+#### IOCache
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_CacheOff,
+    IO_WriteThrough,
+    IO_CopyBack
+} IOCache;
+```
+
+**Description:** Used to specify caching. `IO_CacheOff` inhibits the cache.
+
+---
+
+#### IOChannelCommand
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef unsigned int IOChannelCommand;
+```
+
+---
+
+#### IOChannelDequeueOption
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef unsigned int IOChannelDequeueOption;
+```
+
+---
+
+#### IOChannelEnqueueOption
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef unsigned int IOChannelEnqueueOption;
+```
+
+---
+
+#### IOCharParameter
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef char IOCharParameter[IO_MAX_PARAMETER_ARRAY_LENGTH];
+```
+
+**Description:** Standard type for a character parameter value, used by the get/set parameter functionality provided by IODevice and IODeviceMaster.
+
+---
+
+#### IODDMMsg
+
+**Declared In:** driverkit/debuggingMsg.h
+
+**Synopsis:**
+
+```c
+typedef struct {
+    msg_header_t header;
+    msg_type_t argType;
+    unsigned index;
+    unsigned maskValue;
+    unsigned status;
+    unsigned timestampHighInt;
+    unsigned timestampLowInt;
+    int cpuNumber;
+    msg_type_t stringType;
+    char string[IO_DDM_STRING_LENGTH];
+} IODDMMsg;
+```
+
+**Description:** The message format understood by the Driver Debugging Module. You don't usually have to use this message, as long as DDMViewer is sufficient for your needs.
+
+---
+
+#### IODescriptorCommand
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef unsigned char IODescriptorCommand;
+```
+
+---
+
+#### IODeviceNumber
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef unsigned int IODeviceNumber;
+```
+
+---
+
+#### IODeviceStyle
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_DirectDevice,
+    IO_IndirectDevice,
+    IO_PseudoDevice
+} IODeviceStyle;
+```
+
+**Description:** Returned by the `deviceStyle` method to specify whether the driver is a direct device driver (one that directly controls hardware), an indirect device driver (one that controls hardware using a direct device driver), or a pseudodriver (one that controls no hardware). The driver style determines how it's configured into the system.
+
+---
+
+#### IODisplayInfo
+
+**Declared In:** bsd/dev/i386/displayDefs.h
+
+**Synopsis:**
+
+```c
+typedef struct {
+    int width;
+    int height;
+    int totalWidth;
+    int rowBytes;
+    int refreshRate;
+    void *frameBuffer;
+    IOBitsPerPixel bitsPerPixel;
+    IOColorSpace colorSpace;
+    unsigned int flags;
+    void *parameters;
+} IODisplayInfo;
+```
+
+**Description:** This structure describes a video display. Each linear mode supported by an IOFrameBufferDisplay has a corresponding IODisplayInfo. The structure's fields are:
+
+- **width** – Width, in pixels
+- **height** – Height, in pixels
+- **totalWidth** – Width including undisplayed pixels
+- **rowBytes** – The number of bytes to get from one scanline to next. To determine this value, determine how many 8-bit bytes each pixel occupies (rounding up to an integer) and multiply this by the value of totalWidth. For example, a color display mode that uses 15 bits per pixel and has a totalWidth of 1024 has a rowBytes value of 2048.
+- **refreshRate** – Monitor refresh setting, in Hz
+- **frameBuffer** – Pointer to origin of screen; untyped to force actual screen writes to be dependent on bitsPerPixel. The driver's `initFromDeviceDescription:` method should set this field to the value returned by `mapFrameBufferAtPhysicalAddress:length:`.
+- **bitsPerPixel** – The memory space occupied by one pixel. 8-bit black and white display modes use the value `IO_8BitsPerPixel`, and "16-bit" color display modes that use 5 bits each for red, green, and blue use the value `IO_15BitsPerPixel`.
+- **colorSpace** – Specifies the sample-encoding format. Typically, this value is either `IO_DISPLAY_ONEISWHITECOLORSPACE` (for monochrome modes) or `IO_DISPLAY_RGBCOLORSPACE` (for color modes).
+- **flags** – Flags used to indicate special requirements or conditions to DPS. Currently, this should always be zero.
+- **parameters** – Driver-specific parameters.
+
+**Example:**
+
+```c
+static const IODisplayInfo MyModes[MY_NUM_MODES] = {
+    { 1024, 768, 1024, 1024, 66, 0,
+      IO_8BitsPerPixel, IO_DISPLAY_ONEISWHITECOLORSPACE, 0, 0 },
+    { 1280, 1024, 2048, 2048, 68, 0,
+      IO_8BitsPerPixel, IO_DISPLAY_ONEISWHITECOLORSPACE, 0, 0 },
+    { 800, 600, 800, 1600, 72, 0,
+      IO_15BitsPerPixel, IO_DISPLAY_RGBCOLORSPACE, 0, 0 },
+    { 1024, 768, 1024, 2048, 72, 0,
+      IO_15BitsPerPixel, IO_DISPLAY_RGBCOLORSPACE, 0, 0 }
+};
+```
+
+---
+
+#### IODMAAlignment
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef struct {
+    unsigned readStart;
+    unsigned writeStart;
+    unsigned readLength;
+    unsigned writeLength;
+} IODMAAlignment;
+```
+
+**Description:** Used to specify DMA alignment. A field value of 0 means that alignment isn't restricted for values corresponding to the field.
+
+---
+
+#### IODMABuffer
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef void *IODMABuffer;
+```
+
+**Description:** Used as a machine-independent type for a machine-dependent DMA buffer.
+
+**See also:** IOEISADMABuffer
+
+---
+
+#### IODMADirection
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_DMARead,
+    IO_DMAWrite
+} IODMADirection;
+```
+
+**Description:** Used to specify the direction of DMA. `IO_DMARead` indicates a transfer from the device into system memory; `IO_DMAWrite` indicates a transfer from system memory to the device.
+
+---
+
+#### IODMAStatus
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_None,
+    IO_Complete,
+    IO_Running,
+    IO_Underrun,
+    IO_BusError,
+    IO_BufferError,
+} IODMAStatus;
+```
+
+**Description:** Used to specify machine-independent DMA channel status.
+
+- `IO_None` – No appropriate status
+- `IO_Complete` – DMA channel idle
+- `IO_Running` – DMA channel running
+- `IO_Underrun` – Underrun or overrun
+- `IO_BusError` – Bus error
+- `IO_BufferError` – DMA buffer error
+
+---
+
+#### IODMATransferMode
+
+**Declared In:** driverkit/i386/directDevice.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_Demand,
+    IO_Single,
+    IO_Block,
+    IO_Cascade,
+} IODMATransferMode;
+```
+
+**Description:** Used only in the `setTransferMode:forChannel:` method of the EISA/ISA category of IODirectDevice.
+
+---
+
+#### IOEISADMABuffer
+
+**Declared In:** driverkit/i386/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef void *IOEISADMABuffer;
+```
+
+**Description:** Used as a machine-dependent type for a DMA buffer.
+
+---
+
+#### IOEISADMATiming
+
+**Declared In:** driverkit/i386/directDevice.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_Compatible,
+    IO_TypeA,
+    IO_TypeB,
+    IO_Burst,
+} IOEISADMATiming;
+```
+
+**Description:** Used only in the `setDMATiming:forChannel:` method of the EISA/ISA category of IODirectDevice.
+
+---
+
+#### IOEISADMATransferWidth
+
+**Declared In:** driverkit/i386/directDevice.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_8Bit,
+    IO_16BitWordCount,
+    IO_16BitByteCount,
+    IO_32Bit,
+} IOEISADMATransferWidth;
+```
+
+**Description:** Used only in the `setDMATransferWidth:forChannel:` method of the EISA/ISA category of IODirectDevice.
+
+---
+
+#### IOEISAInterruptHandler
+
+**Declared In:** driverkit/i386/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef void (*IOEISAInterruptHandler)(void *identity,
+                                       void *state,
+                                       unsigned int arg);
+```
+
+---
+
+#### IOEISAPortAddress
+
+**Declared In:** driverkit/i386/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef unsigned short IOEISAPortAddress;
+```
+
+---
+
+#### IOEISAStopRegisterMode
+
+**Declared In:** driverkit/i386/directDevice.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_StopRegisterEnable,
+    IO_StopRegisterDisable,
+} IOEISAStopRegisterMode;
+```
+
+**Description:** Used only in the `setStopRegisterMode:forChannel:` method of the EISA/ISA category of IODirectDevice.
+
+---
+
+#### IOIncrementMode
+
+**Declared In:** driverkit/i386/directDevice.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_Increment,
+    IO_Decrement,
+} IOIncrementMode;
+```
+
+**Description:** Used only in the `setIncrementMode:forChannel:` method of the EISA/ISA category of IODirectDevice.
+
+---
+
+#### IOInterruptHandler
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef void (*IOInterruptHandler)(void *identity,
+                                   void *state,
+                                   unsigned int arg);
+```
+
+---
+
+#### IOInterruptMsg
+
+**Declared In:** driverkit/interruptMsg.h
+
+**Synopsis:**
+
+```c
+typedef struct {
+    msg_header_t header;
+} IOInterruptMsg;
+```
+
+**Description:** The format of the message sent by the kernel to a driver's interrupt handler.
+
+---
+
+#### IOIntParameter
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef int IOIntParameter[IO_MAX_PARAMETER_ARRAY_LENGTH];
+```
+
+**Description:** Standard type for an integer parameter value, used by the get/set parameter functionality provided by IODevice and IODeviceMaster.
+
+---
+
+#### IOIPCSpace
+
+**Declared In:** driverkit/kernelDriver.h
+
+**Synopsis:**
+
+```c
+typedef enum {
+    IO_Kernel,
+    IO_KernelIOTask,
+    IO_CurrentTask
+} IOIPCSpace;
+```
+
+**Description:** Used only by the `IOConvertPort()` function to specify which space to convert the port from and to.
+
+---
+
+#### IONamedValue
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef struct {
+    int value;
+    const char *name;
+} IONamedValue;
+```
+
+**Description:** Map between constants or enumerations and text description.
+
+---
+
+#### IOObjectNumber
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef unsigned int IOObjectNumber;
+```
+
+---
+
+#### IOParameterName
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef char IOParameterName[IO_MAX_PARAMETER_NAME_LENGTH];
+```
+
+**Description:** Standard type for a parameter name, used by the get/set parameter functionality provided by IODevice and IODeviceMaster.
+
+---
+
+#### IORange
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef struct range {
+    unsigned int start;
+    unsigned int size;
+} IORange;
+```
+
+**Description:** Indicates a range of values. Used for memory regions, port regions, and so on.
+
+---
+
+#### IOReturn
+
+**Declared In:** driverkit/return.h
+
+**Synopsis:**
+
+```c
+typedef int IOReturn;
+```
+
+**Description:** IOReturn values are returned by many Driver Kit classes.
+
+---
+
+#### IOSCSIRequest
+
+**Declared In:** driverkit/scsiTypes.h
+
+**Synopsis:**
+
+```c
+typedef struct {
+    unsigned char target;
+    unsigned char lun;
+    cdb_t cdb;
+    BOOL read;
+    int maxTransfer;
+    int timeoutLength;
+    unsigned disconnect:1;
+    unsigned pad:31;
+    sc_status_t driverStatus;
+    unsigned char scsiStatus;
+    int bytesTransferred;
+    ns_time_t totalTime;
+    ns_time_t latentTime;
+    esense_reply_t senseData;
+} IOSCSIRequest;
+```
+
+**Description:** Used in the IOSCSIController protocol's `executeRequest:buffer:client:` method.
+
+---
+
+#### IOString
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+typedef char IOString[IO_STRING_LENGTH];
+```
+
+**Description:** Standard type for an ASCII name, such as a device's name or type.
+
+---
+
+#### IOSwitchFunc
+
+**Declared In:** driverkit/devsw.h
+
+**Synopsis:**
+
+```c
+typedef int (*IOSwitchFunc)();
+```
+
+**Description:** Used by `IOAddToBdevsw()` and `IOAddToCdevsw()` to specify UNIX-style entry points into a driver.
+
+---
+
+#### IOThread
+
+**Declared In:** driverkit/generalFuncs.h
+
+**Synopsis:**
+
+```c
+typedef void *IOThread;
+```
+
+**Description:** An opaque type used by the general-purpose functions to represent a thread.
+
+---
+
+#### IOThreadFunc
+
+**Declared In:** driverkit/generalFuncs.h
+
+**Synopsis:**
+
+```c
+typedef void (*IOThreadFunc)(void *arg);
+```
+
+**Description:** Used by the general-purpose functions to specify the function that a thread should execute.
+
+---
+
+### Symbolic Constants
+
+#### Length Constants
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+IO_STRING_LENGTH
+IO_MAX_PARAMETER_NAME_LENGTH
+IO_MAX_PARAMETER_ARRAY_LENGTH
+```
+
+**Description:** These constants are used to determine the maximum length of the following types:
+
+- `IO_STRING_LENGTH` – IOString
+- `IO_MAX_PARAMETER_NAME_LENGTH` – IOParameterName
+- `IO_MAX_PARAMETER_ARRAY_LENGTH` – IOIntParameter, IOCharParameter
+
+---
+
+#### Debugging String Length
+
+**Declared In:** driverkit/debuggingMsg.h
+
+**Synopsis:**
+
+```c
+IO_DDM_STRING_LENGTH
+```
+
+**Description:** The length of the string field in an IODebuggingMsg.
+
+---
+
+#### Debugging Messages
+
+**Declared In:** driverkit/debuggingMsg.h
+
+**Synopsis:**
+
+| Constant | Meaning |
+|----------|---------|
+| `IO_DDM_MSG_BASE` | The lowest ID an IODebuggingMsg can have |
+| `IO_LOCK_DDM_MSG` | Lock the Driver Debugging Module (DDM) |
+| `IO_UNLOCK_DDM_MSG` | Unlock the DDM |
+| `IO_GET_DDM_ENTRY_MSG` | Get an entry from the DDM |
+| `IO_SET_DDM_MASK_MSG` | Set the debugging mask for the DDM |
+| `IO_CLEAR_DDM_MSG` | Clear all entries from the DDM |
+
+**Description:** Values for the `header.msg_id` field of an IODebuggingMsg.
+
+---
+
+#### Return Values from the DDM
+
+**Declared In:** driverkit/debuggingMsg.h
+
+**Synopsis:**
+
+| Constant | Meaning |
+|----------|---------|
+| `IO_DDM_SUCCESS` | The message was received and understood |
+| `IO_NO_DDM_BUFFER` | The DDM has no entry at the specified offset |
+| `IO_BAD_DDM_INDEX` | The specified index isn't valid |
+
+**Description:** Values for the status field of an IODebuggingMsg.
+
+---
+
+#### DDM Masks
+
+**Declared In:** driverkit/debugging.h
+
+**Synopsis:**
+
+```c
+IO_NUM_DDM_MASKS
+```
+
+**Description:** This constant specifies the number of masks used by the Driver Debugging Module.
+
+---
+
+#### Interrupt Messages
+
+**Declared In:** driverkit/interruptMsg.h
+
+**Synopsis:**
+
+| Constant | Meaning |
+|----------|---------|
+| `IO_INTERRUPT_MSG_ID_BASE` | The lowest ID an IOInterruptMsg can have |
+| `IO_TIMEOUT_MSG` | Timeout message |
+| `IO_COMMAND_MSG` | Command message |
+| `IO_DEVICE_INTERRUPT_MSG` | Sent by the kernel when an interrupt occurs |
+| `IO_DMA_INTERRUPT_MSG` | DMA interrupt message |
+| `IO_FIRST_UNRESERVED_INTERRUPT_MSG` | First unreserved interrupt message ID |
+
+**Description:** Values for the `header.msg_id` field of an IOInterruptMsg.
+
+---
+
+#### IOReturn Constants
+
+**Declared In:** driverkit/return.h
+
+**Synopsis:**
+
+| Constant | Meaning |
+|----------|---------|
+| `IO_R_SUCCESS` | No error occurred |
+| `IO_R_NO_MEMORY` | Couldn't allocate memory |
+| `IO_R_RESOURCE` | Resource shortage |
+| `IO_R_VM_FAILURE` | Miscellaneous virtual memory failure |
+| `IO_R_INTERNAL` | Internal library error |
+| `IO_R_RLD` | Error in loading a relocatable file |
+| `IO_R_IPC_FAILURE` | Error during IPC |
+| `IO_R_NO_CHANNELS` | No DMA channels are available |
+| `IO_R_NO_SPACE` | No address space is available for mapping |
+| `IO_R_NO_DEVICE` | No such device |
+| `IO_R_PRIVILEGE` | Privilege/access violation |
+| `IO_R_INVALID_ARG` | Invalid argument |
+| `IO_R_BAD_MSG_ID` | Bad message ID |
+| `IO_R_UNSUPPORTED` | Unsupported function |
+| `IO_R_INVALID` | Should never be seen |
+| `IO_R_LOCKED_READ` | Device is read locked |
+| `IO_R_LOCKED_WRITE` | Device is write locked |
+| `IO_R_EXCLUSIVE_ACCESS` | Device is exclusive access and is already open |
+| `IO_R_CANT_LOCK` | Can't acquire requested lock |
+| `IO_R_NOT_OPEN` | Device not open |
+| `IO_R_OPEN` | Device is still open |
+| `IO_R_NOT_READABLE` | Reading not supported |
+| `IO_R_NOT_WRITABLE` | Writing not supported |
+| `IO_R_IO` | General I/O error |
+| `IO_R_BUSY` | Device is busy |
+| `IO_R_NOT_READY` | Device isn't ready |
+| `IO_R_OFFLINE` | Device is off line |
+| `IO_R_ALIGN` | DMA alignment error |
+| `IO_R_MEDIA` | Media error |
+| `IO_R_DMA` | DMA failure |
+| `IO_R_TIMEOUT` | I/O timeout |
+| `IO_R_NOT_ATTACHED` | The device or channel isn't attached |
+| `IO_R_PORT_EXISTS` | The device port already exists |
+| `IO_R_CANT_WIRE` | Can't wire down physical memory |
+| `IO_R_NO_INTERRUPT` | No interrupt port is attached |
+| `IO_R_NO_FRAMES` | No DMA is enqueued |
+
+**Description:** Values for IOReturns.
+
+---
+
+#### IODevice Parameter Names
+
+**Declared In:** driverkit/IODevice.h
+
+**Synopsis:**
+
+| Constant | Meaning |
+|----------|---------|
+| `IO_CLASS_NAME` | The value returned by `+ name` |
+| `IO_DEVICE_NAME` | The value returned by `– name` |
+| `IO_DEVICE_KIND` | The value returned by `– deviceKind` |
+| `IO_UNIT` | The value returned by `– unit` |
+
+---
+
+#### Null Constants
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+#define NULL 0
+#define IO_NULL_VM_TASK    ((vm_task_t)0)
+```
+
+**Description:** Standard null values, used in various places.
+
+---
+
+### Global Variables
+
+#### IODDMMasks
+
+**Declared In:** driverkit/debugging.h
+
+**Synopsis:**
+
+```c
+unsigned int IODDMMasks[IO_NUM_DDM_MASKS];
+```
+
+**Description:** The bitmask used to filter storing of debugging events. See the discussion of the Driver Debugging Module in Chapter 2 for more information.
+
+---
+
+#### IODMAStatusStrings
+
+**Declared In:** driverkit/driverTypes.h
+
+**Synopsis:**
+
+```c
+const IONamedValue IODMAStatusStrings[];
+```
+
+**Description:** Used as an argument to `IOFindNameForValue()` to convert an IODMAStatus value into an error string.
+
+---
+
 ## Other Features
 
 ### Auto Detection of Devices
