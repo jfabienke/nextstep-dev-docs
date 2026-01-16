@@ -3454,6 +3454,249 @@ Returns zero. Subclasses that support standard statistics should implement this 
 
 ---
 
+### IOSVGADisplay
+
+**Inherits From:** IOFrameBufferDisplay : IODisplay : IODirectDevice : IODevice : Object
+
+**Conforms To:** IOScreenEvents
+
+**Declared In:** driverkit/IOSVGADisplay.h
+
+#### Class Description
+
+IOSVGADisplay is an abstract superclass of SVGA (Super VGA) display drivers. Unlike framebuffer devices, which have linear frame buffers, SVGA devices have segmented memories. The IOSVGADisplay class defines the protocol for segmented memories. Specifically, a mapping of segmented device memory is set up by the Window Server, and this mapping is maintained by invoking the `selectActiveSegment:` and `deselectActiveSegment:` methods in the IOSVGADisplay instance.
+
+IOSVGADisplay supports standard 2-bit grayscale modes. More specifically, this means the `svgaMode` that is specified in the display's device-specific configuration table must be a 2-bit grayscale mode. The specific resolution and refresh rates are up to you.
+
+##### Implementing a Subclass
+
+Implementing an IOSVGADisplay subclass is almost identical to implementing an IOFrameBufferDisplay. The `enterLinearMode` method does not have to be implemented, but you must implement the following:
+
+- `selectActiveSegment:` – Select a segment for device memory accesses.
+- `deselectActiveSegment:` – De-select a segment.
+- `segmentSize` – Return the segment size for this display in bytes.
+
+The following methods may be implemented to take advantage of features provided by your device. For the most part, just return `NO` from these methods if your device does not support the feature. If it does, then return `YES` and do the right thing.
+
+- `enterLinearMode` – Try to enter linear mode and return `YES` if successful; otherwise, return `NO`.
+- `setTransferTable:count:` – Install new gamma correction values (return `NO` if not supported).
+
+If you find that you need to implement a PostScript driver for your IOSVGADisplay subclass, you can implement your PostScript driver in C. Your C code must register a "drawFunc," which has the following form:
+
+```objc
+typedef void (*SVGADrawFunc)(
+    id driver,
+    unsigned char *seg,
+    int segmentSize,
+    int deltaRow,
+    int deltaCol,
+    int yStart,
+    int yEnd,
+    int xStart,
+    int xEnd,
+    int lineByteDiff);
+```
+
+The C routine that initializes your C PostScript driver should call `PSWSetSVGADrawFunc()` with the address of the C draw function to use.
+
+When the Window Server issues a drawing operation to your driver, the `drawSVGARect:deltaY:deltaX:yFrom:yTo:xFrom:xTo:byteDelta:` method is called. If you haven't registered a C draw function, the default implementation is called; it simply calls `selectActiveSegment:` and `deselectActiveSegment:` once for each segment touched by the drawing operation. If you have registered a C draw function, the default implementation will call your C draw function, which gets to decide when to call `selectActiveSegment:` and `deselectActiveSegment:`.
+
+You can find additional information and source code for an IOSVGADisplay subclass in the source code for the VGA driver. You must make sure that you leave your display in VGA text mode at boot time.
+
+#### Instance Variables
+
+None declared at this level.
+
+#### Method Types
+
+**Querying the device**
+- `– segmentSize`
+
+**Managing segments**
+- `– selectActiveSegment:`
+- `– deselectActiveSegment:`
+
+**Drawing support**
+- `– drawSVGARect:deltaY:deltaX:yFrom:yTo:xFrom:xTo:byteDelta:`
+
+#### Instance Methods
+
+##### deselectActiveSegment:
+
+```objc
+- (void)deselectActiveSegment:(int)segment
+```
+
+Invoked when a previously selected segment is no longer needed. Your subclass should implement this method to perform any hardware-specific operations needed to de-select the segment.
+
+**See also:** `– selectActiveSegment:`
+
+##### drawSVGARect:deltaY:deltaX:yFrom:yTo:xFrom:xTo:byteDelta:
+
+```objc
+- (void)drawSVGARect:(const void *)imageBase
+              deltaY:(int)deltaRow
+              deltaX:(int)deltaCol
+               yFrom:(int)yStart
+                 yTo:(int)yEnd
+               xFrom:(int)xStart
+                 xTo:(int)xEnd
+           byteDelta:(int)lineByteDiff
+```
+
+Called when a drawing operation is performed. If your C PostScript driver has registered a C draw function, it will be called by the default implementation of this method. Otherwise, this method will loop over all segments involved in the drawing operation, call `selectActiveSegment:`, and, when done with the segment, call `deselectActiveSegment:`. See the class description for more information on registering a C draw function.
+
+##### segmentSize
+
+```objc
+- (int)segmentSize
+```
+
+Returns the size, in bytes, of a segment. SVGA devices typically have segments of 64 KB.
+
+**See also:** `– selectActiveSegment:` and `– deselectActiveSegment:`
+
+##### selectActiveSegment:
+
+```objc
+- (void)selectActiveSegment:(int)segment
+```
+
+Invoked when a new segment needs to be selected for device memory access. Your subclass should implement this method to perform any hardware-specific operations needed to make the segment active.
+
+The Window Server maintains a mapping to device memory that corresponds to a single segment. When the Window Server wants to access a different segment, this method is invoked to make that segment visible in the previously established memory mapping. The protocol is that the IOSVGADisplay instance manipulates the device so that when the Window Server accesses its mapped memory, it is really accessing the requested segment.
+
+**See also:** `– deselectActiveSegment:`
+
+---
+
+### IOTokenRing
+
+**Inherits From:** IONetwork : IODirectDevice : IODevice : Object
+
+**Conforms To:** IONetworkDeviceMethods
+
+**Declared In:** driverkit/IOTokenRing.h
+
+#### Class Description
+
+IOTokenRing is an abstract superclass for Token Ring network drivers. Some Token Ring devices can handle the Token Ring packet framing for the driver; others require the driver to format the Token Ring packets.
+
+If you're writing a Token Ring driver, the following conventions apply to reading and receiving Token Ring packets:
+
+**Receiving packets:** If the device handles Token Ring framing, your receive method should parse the Token Ring header and feed the network layer only the network layer data. If the device doesn't handle Token Ring framing, then you should use the `isInputPacket:freeWhenDone:` method that is declared by IONetwork. This method will handle the Token Ring framing for you.
+
+**Sending packets:** When sending a packet, you need to decide which IONetwork method to call to get the data from. If your device can't handle Token Ring framing, use `getInputPacket:`. If the device handles Token Ring framing, you need to deal with an IONetwork `tokenHeader_t` struct, and you should use the non-Token Ring version of `getInputPacket:`.
+
+The `tokenHeader_t` struct contains four fields: `macHdr`, `dsap`, `ssap`, and `ctrl`. You must use the information in this struct to format the Token Ring packet appropriately for the device.
+
+IOTokenRing defines the following public types and constants:
+
+```objc
+typedef struct {
+    u_char dsap;
+    u_char ssap;
+    u_char ctrl;
+    u_char macHdr[32];
+} tokenHeader_t;
+
+#define IO_IS_BROADCAST(addr) \
+    ((addr)[0] & (unsigned char)0x80)
+
+typedef enum {
+    IO_TR_SPEED_4,      // 4 Mbps
+    IO_TR_SPEED_16      // 16 Mbps
+} IOTokenRingSpeed;
+```
+
+The ring speed constants are used by the `ringSpeed` method.
+
+##### Implementing a Subclass
+
+Your subclass must implement the following methods:
+
+- `resetAndEnable:` – Resets the device, optionally enabling it to work.
+- `getHardwareAddress:` – Returns the device's hardware address.
+- `ringSpeed` – Returns the speed at which the device is running.
+
+It's also a good idea to implement a `setRunning:` method and enable or disable interrupts as appropriate.
+
+In your subclass, you must call your superclass's implementation of `initFromDeviceDescription:`. The IOTokenRing implementation does the following:
+
+1. Allocates an IONetwork instance by calling `attachToNetworkWithAddress:`
+2. Registers the instance with that IONetwork object
+
+If you want to support user-level configuration or provide debugging support, you should implement these methods from the IODevice class: `getIntValues:forParameter:count:` and `setIntValues:forParameter:count:`.
+
+In general, implementing a Token Ring driver is similar to implementing an Ethernet driver. See the IOEthernet class specification for more information.
+
+#### Instance Variables
+
+```objc
+IOTokenRingSpeed ringSpeed;
+```
+
+**ringSpeed** – The current ring speed (4 Mbps or 16 Mbps).
+
+#### Method Types
+
+**Initializing the driver**
+- `– initFromDeviceDescription:`
+
+**Accessing hardware addresses**
+- `– getHardwareAddress:`
+
+**Ring control**
+- `– ringSpeed`
+- `– resetAndEnable:`
+
+#### Instance Methods
+
+##### getHardwareAddress:
+
+```objc
+- (void)getHardwareAddress:(enet_addr_t *)address
+```
+
+Returns by reference the hardware Token Ring address for the device. (This is the "source address" that the device uses when it sends a packet.) This method is called by the IOTokenRing implementation of the `initFromDeviceDescription:` method. Your subclass must implement this method.
+
+**See also:** `– initFromDeviceDescription:`
+
+##### initFromDeviceDescription:
+
+```objc
+- initFromDeviceDescription:(IODeviceDescription *)devDesc
+```
+
+This implementation of the IODirectDevice method performs additional initialization for Token Ring devices: It calls `attachToNetworkWithAddress:` with the device's hardware address (as returned by `getHardwareAddress:`) and then registers the IOTokenRing instance with the returned IONetwork object. If an error occurs during this process, the implementation returns `nil`; otherwise, it returns `self`.
+
+Your subclass should invoke the superclass implementation of this method. You can perform other initialization before or after invoking `super`'s implementation, depending on your driver's needs.
+
+**See also:** `– attachToNetworkWithAddress:` (IONetwork), `– getHardwareAddress:`
+
+##### resetAndEnable:
+
+```objc
+- (void)resetAndEnable:(BOOL)enable
+```
+
+Resets the device. If *enable* is `YES`, this method should also perform all the work necessary to open the Token Ring device and join the ring. If *enable* is `NO`, this method should disable the device so that it can't send or receive packets and also cause it to leave the ring. Your subclass must implement this method.
+
+##### ringSpeed
+
+```objc
+- (IOTokenRingSpeed)ringSpeed
+```
+
+Returns one of the following values:
+
+- `IO_TR_SPEED_4` – The device is running at 4 Mbps.
+- `IO_TR_SPEED_16` – The device is running at 16 Mbps.
+
+Your subclass must implement this method. IOTokenRing has a *ringSpeed* instance variable that you can use to store the ring speed.
+
+---
+
 ## See Also
 
 - Driver Kit Architecture documentation (Chapter 1)
