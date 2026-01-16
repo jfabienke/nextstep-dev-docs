@@ -149,7 +149,7 @@
 1. [Driver Kit Architecture](DriverKit/01_Architecture.md)
 2. [Designing a Driver](DriverKit/02_Designing.md)
 3. [Support for Specific Devices](DriverKit/03_SpecificDevices.md)
-4. [Building, Configuring, and Debugging Drivers](DriverKit/04_BuildingConfiguring.md) <!-- Missing -->
+4. [Building, Configuring, and Debugging Drivers](DriverKit/04_BuildingConfiguring.md)
 5. [Driver Kit Reference](DriverKit/05_Reference.md) <!-- Missing -->
 - [Appendix — Suggested Reading](DriverKit/Appendix_SuggestedReading.md) <!-- Missing -->
 
