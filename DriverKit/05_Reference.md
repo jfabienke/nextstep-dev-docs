@@ -2171,6 +2171,954 @@ Sets the array and number of I/O port ranges associated with this device. You sh
 
 ---
 
+### IOEthernet
+
+**Inherits From:** IODirectDevice : IODevice : Object
+
+**Conforms To:** IONetworkDeviceMethods
+
+**Declared In:** driverkit/IOEthernet.h
+
+#### Class Description
+
+IOEthernet is an abstract class for controlling Ethernet devices. It provides a framework for sending and receiving packets, handling interrupts, and setting and detecting transmission timeouts. It also provides an IONetwork instance that connects the driver with the kernel networking subsystem, as well as an I/O thread from which most of the IOEthernet instance methods are invoked.
+
+IOEthernet includes support for multicast mode and promiscuous mode. It doesn't currently provide gdb support for non-NeXT drivers. (gdb support enables the kernel running the IOEthernet driver to be debugged over the network.)
+
+IOEthernet's multicast support consists mainly of keeping a list of the multicast addresses at which multicast packets should be received and providing methods for configuring multicast addresses. Depending on the hardware's capability, you can either implement `enableMulticastMode` and `disableMulticastMode` to allow and disallow receptions of all multicast packets or implement `addMulticastAddress:` and `removeMulticastAddress:` to configure the hardware for individual addresses.
+
+Most hardware implementations don't guarantee filtering based on individual addresses. For this reason, the `isUnwantedMulticastPacket:` method exists to indicate packets that aren't bound for an address in the list of valid multicast addresses. A subclass of IOEthernet written for hardware that implements partial or no filtering based upon individual addresses should invoke this method each time it receives a multicast packet to determine whether it should be discarded or not.
+
+To write an Ethernet driver, you create a subclass of IOEthernet.
+
+##### Implementing a Subclass
+
+Your subclass of IOEthernet must do the following:
+
+- Implement `probe:` and `initFromDeviceDescription:`. The implementation of `probe:` should allocate an instance and invoke `initFromDeviceDescription:`. See the IODevice specification for more information on implementing `probe:`.
+- Implement `transmit:`, `resetAndEnable:`, `interruptOccurred`, and `timeoutOccurred`. These methods perform the real work of the driver. `interruptOccurred` is invoked from the I/O thread whenever the Ethernet hardware interrupts. See the EISA/ISA method descriptions in the IODirectDevice specification for more information on `interruptOccurred` and `timeoutOccurred`.
+
+If your subclass supports multicast mode, you must implement either `enableMulticastMode` and `disableMulticastMode` or `addMulticastAddress:` and `removeMulticastAddress:`.
+
+If your subclass supports promiscuous mode, you must implement `enablePromiscuousMode` and `disablePromiscuousMode`.
+
+##### IONetworkDeviceMethods Protocol Implementation
+
+In IOEthernet's implementation, `finishInitialization` invokes `resetAndEnable:YES` if `[self isRunning] == YES`.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Creating and destroying IOEthernet instances**
+- `– free`
+- `– initFromDeviceDescription:`
+- `– attachToNetworkWithAddress:`
+
+**Handling interrupts**
+- `– interruptOccurred` (IODirectDevice)
+
+**Transmitting packets**
+- `– transmit:`
+- `– performLoopback:`
+
+**Setting and handling hardware timeouts**
+- `– setRelativeTimeout:`
+- `– relativeTimeout`
+- `– clearTimeout`
+- `– timeoutOccurred` (IODirectDevice)
+
+**Setting and getting the state of the hardware**
+- `– isRunning`
+- `– resetAndEnable`
+
+**Supporting multicast**
+- `– enableMulticastMode`
+- `– disableMulticastMode`
+- `– addMulticastAddress:`
+- `– removeMulticastAddress:`
+- `– isUnwantedMulticastPacket:`
+
+**Supporting promiscuity**
+- `– disablePromiscuousMode`
+- `– enablePromiscuousMode`
+
+#### Adopted Protocols
+
+**IONetworkDeviceMethods**
+- `– allocateNetbuf`
+- `– finishInitialization`
+- `– outputPacket:address:`
+- `– performCommand:data:`
+
+#### Instance Methods
+
+##### addMulticastAddress:
+
+```objc
+- (void)addMulticastAddress:(enet_addr_t *)address
+```
+
+Does nothing. Subclasses that support multicast mode can implement this method so that it notifies the hardware that it should receive packets sent to *address*. Some subclasses that support multicast don't implement this method because their hardware doesn't provide filtering based upon individual multicast addresses. Instead, they inspect all multicast packets, using `isUnwantedMulticastPacket:` to weed out packets to unwanted multicast addresses. This method, followed by `enableMulticastMode`, is invoked in the I/O thread every time a new multicast address is added to the list that IOEthernet maintains.
+
+**See also:** `– enableMulticastMode`, `– isUnwantedMulticastPacket:`, `– removeMulticastAddress:`
+
+##### attachToNetworkWithAddress:
+
+```objc
+- (IONetwork *)attachToNetworkWithAddress:(enet_addr_t)address
+```
+
+Creates an IONetwork instance and attaches to the network subsystem by sending the IONetwork an `initForNetworkDevice:...` message. Before returning, this method logs a message including the ethernet address. Returns the IONetwork instance just created.
+
+You invoke this method at the end of your implementation of `initFromDeviceDescription:`. You must invoke `resetAndEnable:NO` before invoking this method, as described under `initFromDeviceDescription:`.
+
+##### clearTimeout
+
+```objc
+- (void)clearTimeout
+```
+
+If a transmission timeout is scheduled, unschedules the timeout. This method is normally invoked from a subclass's implementation of `interruptOccurred`.
+
+**See also:** `– setRelativeTimeout:`, `– relativeTimeout`, `– timeoutOccurred`
+
+##### disableMulticastMode
+
+```objc
+- (void)disableMulticastMode
+```
+
+Does nothing. Subclasses that support multicast mode and implement `enableMulticastMode` should implement this method so that it disables the hardware's support for multicast mode. This method is invoked in the I/O thread when the last multicast address has been removed from the list that IOEthernet maintains.
+
+**See also:** `– enableMulticastMode`
+
+##### disablePromiscuousMode
+
+```objc
+- (void)disablePromiscuousMode
+```
+
+Does nothing. Subclasses that support promiscuous mode must implement this method so that it disables the hardware's support for promiscuous mode. This method is invoked in the I/O thread by the networking subsystem.
+
+**See also:** `– enablePromiscuousMode`
+
+##### enableMulticastMode
+
+```objc
+- (BOOL)enableMulticastMode
+```
+
+Does nothing and returns YES. Subclasses that support multicast mode can implement this method so that it enables the hardware's support for multicast mode. Every time a new multicast address is added to the list that IOEthernet maintains, `addMulticastAddress:` and this method are invoked in the I/O thread.
+
+**See also:** `– disableMulticastMode`
+
+##### enablePromiscuousMode
+
+```objc
+- (BOOL)enablePromiscuousMode
+```
+
+Does nothing and returns YES. Subclasses that support promiscuous mode must implement this method so that it enables the hardware's support for promiscuous mode. This method is invoked in the I/O thread by the networking subsystem.
+
+**See also:** `– enablePromiscuousMode`
+
+##### free
+
+```objc
+- free
+```
+
+Frees the IOEthernet instance and returns `nil`.
+
+##### initFromDeviceDescription:
+
+```objc
+- initFromDeviceDescription:(IODeviceDescription *)deviceDescription
+```
+
+Initializes a newly allocated IOEthernet instance. This includes invoking `initFromDeviceDescription:` on super; invoking `startIOThread`; setting the name, kind, and unit of this instance; and invoking `registerDevice`.
+
+Subclasses of IOEthernet should implement this method so that it invokes `[super initFromDeviceDescription:]` and then performs any device-specific initialization. The subclass implementation should invoke `resetAndEnable:NO` and should finish by invoking `attachToNetworkWithAddress:`. An example of a subclass implementation of this method is below. Italicized text delineated in angle brackets is to be filled in with device-specific code.
+
+```objc
+- initFromDeviceDescription:(IODeviceDescription *)devDesc
+{
+    IOEISADeviceDescription *deviceDescription =
+        (IOEISADeviceDescription *)devDesc;
+    IORange *io;
+
+    if ([super initFromDeviceDescription:devDesc] == nil)
+        return nil;
+
+    /* Perform any 1-time hardware initialization. */
+
+    /* NOTE: This implementation of resetAndEnable: sets myAddress. */
+    [self resetAndEnable:NO];  // Finish initializing the hardware
+
+    /* Perform any additional software initialization. */
+
+    network = [self attachToNetworkWithAddress:myAddress];
+    return self;
+}
+```
+
+Returns `self` if the instance was successfully initialized; otherwise, frees itself and returns `nil`.
+
+##### isRunning
+
+```objc
+- (BOOL)isRunning
+```
+
+Returns YES if the hardware is currently capable of communication with other stations in the network; otherwise, returns NO.
+
+**See also:** `– setRunning:`
+
+##### isUnwantedMulticastPacket:
+
+```objc
+- (BOOL)isUnwantedMulticastPacket:(ether_header_t *)header
+```
+
+Determines whether the specified packet is to a multicast address that this device shouldn't listen to. Returns YES if the packet should be dropped; otherwise, returns NO.
+
+**See also:** `– addMulticastAddress:`
+
+##### performLoopback:
+
+```objc
+- (void)performLoopback:(netbuf_t)packet
+```
+
+Determines whether the outgoing packet should be received by this device (because it's a broadcast packet, for example, or a multicast packet for an enabled address). If so, simulates reception by sending a copy of *packet* to the protocol stack. You should invoke this method in your `transmit:` method if your hardware device can't receive its own packets.
+
+##### relativeTimeout
+
+```objc
+- (unsigned int)relativeTimeout
+```
+
+Returns the number of milliseconds until a transmission timeout will occur. If no transmission timeout is currently scheduled, this method returns zero.
+
+**See also:** `– clearTimeout`, `– setRelativeTimeout:`, `– timeoutOccurred`
+
+##### removeMulticastAddress:
+
+```objc
+- (void)removeMulticastAddress:(enet_addr_t *)address
+```
+
+Does nothing. Subclasses that support multicast mode can implement this method so that it notifies the hardware that it should stop listening for packets sent to *address*.
+
+**See also:** `– addMulticastAddress:`, `– disableMulticastMode`
+
+##### resetAndEnable:
+
+```objc
+- (BOOL)resetAndEnable:(BOOL)enable
+```
+
+Does nothing and returns YES. Subclasses of IOEthernet must implement this method so that it resets and initializes the hardware. Interrupts should be enabled if *enable* is YES; otherwise, they should be left disabled. In either case, this method should invoke `setRunning:` to record the basic state of the device.
+
+This method should return YES if it encounters no errors (no matter what the value of *enable* is); if it encounters errors, it should return NO. For example, the result from `resetAndEnable:NO` should be YES if the reset is successful.
+
+The only time this method is invoked, with the exception of any invocations from your IOEthernet subclass implementation, is during initialization. Specifically, `resetAndEnable:YES` is invoked once in the I/O thread after `attachToNetworkWithAddress:` is invoked.
+
+**See also:** `– setRunning:`
+
+##### setRelativeTimeout:
+
+```objc
+- (void)setRelativeTimeout:(unsigned int)timeout
+```
+
+Schedules a timeout to occur in *timeout* milliseconds. This method is generally invoked by the IOEthernet's `transmit:` method. When *timeout* milliseconds pass without the timeout being cleared (with `clearTimeout`), the method `timeoutOccurred` is invoked.
+
+**See also:** `– clearTimeout`, `– relativeTimeout`, `– timeoutOccurred`
+
+##### setRunning:
+
+```objc
+- (void)setRunning:(BOOL)running
+```
+
+Sets whether the hardware is on line. The value of *running* should be YES to indicate that the hardware is on line; otherwise, it should be NO. This method is invoked only by methods in IOEthernet subclasses--not by IOEthernet's own method implementations. You should invoke this method in your implementation of `resetAndEnable:`.
+
+**See also:** `– isRunning`
+
+##### transmit:
+
+```objc
+- (void)transmit:(netbuf_t)packet
+```
+
+Does nothing except free *packet*, using the `nb_free()` function. This method is invoked by the kernel networking subsystem when the hardware should transmit a packet.
+
+Subclasses of IOEthernet must implement this method. To determine the number of bytes of data to be transmitted, use the `nb_size()` function. To get a pointer to the data, use `nb_map()`. After getting the information you need from *packet*, you must free it with `nb_free()`. Just before transmitting the packet, you can set a timeout with `setRelativeTimeout:`. If your hardware can't receive packets it transmits, you must invoke `performLoopback:` in your implementation of this method.
+
+This method can be invoked in many contexts, not just from the I/O thread (or from the I/O task). For example, `transmit:` and `interruptOccurred` can run at the same time, so any common structures they both use must be protected with locks.
+
+---
+
+### IOFrameBufferDisplay
+
+**Inherits From:** IODisplay : IODirectDevice : IODevice : Object
+
+**Conforms To:** IOScreenEvents
+
+**Declared In:** driverkit/IOFrameBufferDisplay.h
+
+#### Class Description
+
+IOFrameBufferDisplay is an abstract class for managing display cards that support linear-mode frame buffers. IOFrameBufferDisplay's close interaction with the window server and event system means that your driver needs to do very little.
+
+**Note:** If your display adapter doesn't allow you to linearly address the entire frame buffer at once, use the IOSVGADisplay class instead.
+
+IOFrameBufferDisplay currently supports the following bit depths:
+
+- 2-bit grayscale
+- 8-bit grayscale
+- 8-bit color
+- 16-bit RGB (5-5-5 or 4-4-4--both with 4096 colors)
+- 24-bit RGB (8-8-8)
+
+Most of the work in writing a IOFrameBufferDisplay driver is determining how to put the hardware into an advanced mode in which the frame buffer is linearly addressable. Some drivers support several advanced modes, which the user chooses between using the Configure application. The IODisplayInfo specification describes how to specify the modes your driver supports.
+
+When specifying your driver's memory ranges in its default configuration table, you must first specify the addresses of the linear frame buffer, and then the addresses 0xa0000-0xbffff and 0xc0000-0xcffff.
+
+```
+"Memory Maps" = "0x7e00000-0x7ffffff 0xa0000-0xbffff 0xc0000-0xcffff";
+```
+
+See the IODisplayInfo specification for information on display-specific configuration keys.
+
+##### Implementing a Subclass
+
+In your subclass of IOFrameBufferDisplay, you must implement the following methods:
+
+- `initFromDeviceDescription:`
+- `enterLinearMode`
+- `revertToVGAMode`
+
+You might also need to implement two more methods:
+
+- If the hardware supports setting brightness, you must implement `setBrightness:`.
+- To support multiple gamma correction tables, implement `setTransferTable:count:`.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Creating and initializing IOFrameBufferDisplays**
+- `+ probe:`
+- `– initFromDeviceDescription:`
+
+**Getting and setting parameters**
+- `– getIntValues:forParameter:count:`
+- `– setCharValues:forParameter:count:`
+- `– setIntValues:forParameter:count:`
+
+**Handling the cursor**
+- `– hideCursor:`
+- `– moveCursor:frame:token:`
+- `– showCursor:frame:token:`
+
+**Setting screen brightness**
+- `– setBrightness:token:`
+
+**Setting the gamma correction table**
+- `– setTransferTable:count:`
+
+**Mapping the frame buffer**
+- `– mapFrameBufferAtPhysicalAddress:length:`
+
+**Choosing display modes**
+- `– enterLinearMode`
+- `– revertToVGAMode`
+- `– selectMode:count:`
+- `– selectMode:count:valid:`
+
+#### Class Methods
+
+##### probe:
+
+```objc
++ (BOOL)probe:deviceDescription
+```
+
+Without checking for the presence of hardware, allocates and initializes an IOFrameBufferDisplay. You shouldn't reimplement this method.
+
+If the initialization (done with `initFromDeviceDescription:`) is unsuccessful, this method returns NO. Otherwise, this method sets the device kind to "Linear Framebuffer", invokes `registerDevice`, and returns YES.
+
+**See also:** `– initFromDeviceDescription:`
+
+#### Instance Methods
+
+##### enterLinearMode
+
+```objc
+- (void)enterLinearMode
+```
+
+Implemented by subclasses to put the display into linear frame buffer mode. This method is invoked by the system when appropriate, such as when the window server starts running.
+
+**See also:** `– revertToVGAMode`
+
+##### getIntValues:forParameter:count:
+
+```objc
+- (IOReturn)getIntValues:(unsigned int *)parameterArray
+            forParameter:(IOParameterName)parameterName
+                   count:(unsigned int *)count
+```
+
+Handles NeXT-internal parameters specific to IOFrameBufferDisplays; forwards the handling of all other parameters to super.
+
+**See also:** `– getIntValues:forParameter:count:` (IODevice)
+
+##### hideCursor:
+
+```objc
+- hideCursor:(int)token
+```
+
+Implements this method, as described in the IOScreenEvents protocol specification. You should never need to invoke or implement this method.
+
+##### initFromDeviceDescription:
+
+```objc
+- initFromDeviceDescription:deviceDescription
+```
+
+Invokes `initFromDeviceDescription:` on super. If successful, sets the unit number and the name (to "Display" followed by the unit number). Frees itself if initialization was unsuccessful.
+
+Subclasses must implement this method so that it performs all initialization necessary to set up the device and the driver. This includes setting the IODisplayInfo structure (as described in the IODisplay class description) and invoking `mapFrameBufferAtPhysicalAddress:length:`. If possible, this method should also check the hardware to see if it matches the IOConfigTable. If the hardware doesn't match, the driver should do what it can to ensure that the display is still usable.
+
+**See also:** `+ probe:`
+
+##### mapFrameBufferAtPhysicalAddress:length:
+
+```objc
+- (vm_address_t)mapFrameBufferAtPhysicalAddress:(unsigned int)address
+                                         length:(int)numBytes
+```
+
+Maps the physical memory for this instance into virtual memory for use by the device driver. If *address* is 0, this method maps the physical memory corresponding to local memory range 0, and *numBytes* is ignored. If *address* is not 0, the reserved resources are overridden--*address* is used as the physical memory address and *numBytes* is used as the length. The mapped memory range is cached as specified in the IODisplayInfo for this instance.
+
+**Note:** When overriding reserved resources, you can't map memory outside of the memory range reserved for the device. However, you can map a subset of the memory range.
+
+You should invoke this method during initialization.
+
+Returns the virtual address that corresponds to *address*. If the memory mapping failed, this method logs an error message and returns NULL.
+
+**See also:** `– initFromDeviceDescription:`
+
+##### moveCursor:frame:token:
+
+```objc
+- moveCursor:(Point *)cursorLoc
+       frame:(int)frame
+       token:(int)token
+```
+
+Implements this method, as described in the IOScreenEvents protocol specification. You should never need to invoke or implement this method.
+
+##### revertToVGAMode
+
+```objc
+- (void)revertToVGAMode
+```
+
+Implemented by subclasses to remove the display from whatever advanced mode it's in and enter a mode in which it can be used as a standard VGA device.
+
+**See also:** `– enterLinearMode`
+
+##### selectMode:count:
+
+```objc
+- (int)selectMode:(const IODisplayInfo *)modeList
+            count:(int)count
+```
+
+Invokes `selectMode:count:valid:`, specifying 0 for the last argument.
+
+##### selectMode:count:valid:
+
+```objc
+- (int)selectMode:(const IODisplayInfo *)modeList
+            count:(int)count
+            valid:(const BOOL *)isValid
+```
+
+Determines which IODisplayInfo in the driver-supplied *modeList* matches the value of the "Display Mode" key in the device's IOConfigTable. Drivers that support multiple advanced modes should invoke this method during initialization. When the driver receives a `enterLinearMode` message, it should enter the mode selected by this method. If this method doesn't find a valid mode, the driver should determine a mode that will work.
+
+The "Display Mode" key is a configuration key that can be used by drivers to support multiple modes--for example, both 8-bit gray and 16-bit RGB. IODisplayInfo is defined in the header file driverkit/displayDefs.h.
+
+The *modeList* argument should contain a IODisplayInfo for each advanced mode the driver supports. The *count* argument should specify the number of IODisplayInfos in *modeList*. *isValid* should either be 0 (in which case it's ignored) or an array that corresponds to the *modeList*. If `isValid[1]` is NO, for example, then this method ignores the IODisplayInfo pointed to by `modeList[1]`.
+
+If this method finds a match, it returns the index of the matching IODisplayInfo in *modeList*. If the "Display Mode" key is missing or its value is improperly formatted, or if a corresponding IODisplayInfo isn't found, this method returns -1.
+
+See the IODisplay class description for information on display modes and the IODisplayInfo type.
+
+##### setBrightness:token:
+
+```objc
+- setBrightness:(int)level
+          token:(int)token
+```
+
+Checks whether *level* is between `EV_SCREEN_MIN_BRIGHTNESS` and `EV_SCREEN_MAX_BRIGHTNESS` (inclusive). If not, this method logs an error message. Subclasses that support brightness changes should override this method and implement it as described in the IOScreenEvents protocol specification.
+
+Returns `self`.
+
+##### setCharValues:forParameter:count:
+
+```objc
+- (IOReturn)setCharValues:(unsigned char *)parameterArray
+             forParameter:(IOParameterName)parameterName
+                    count:(unsigned int)count
+```
+
+Handles NeXT-internal parameters specific to IOFrameBufferDisplays; forwards the handling of all other parameters to super.
+
+**See also:** `– setCharValues:forParameter:count:` (IODevice)
+
+##### setIntValues:forParameter:count:
+
+```objc
+- (IOReturn)setIntValues:(unsigned int *)parameterArray
+            forParameter:(IOParameterName)parameterName
+                   count:(unsigned int)count
+```
+
+Handles NeXT-internal parameters specific to IOFrameBufferDisplays; forwards the handling of all other parameters to super.
+
+**See also:** `– setIntValues:forParameter:count:` (IODevice)
+
+##### setTransferTable:count:
+
+```objc
+- setTransferTable:(const unsigned int *)table
+             count:(int)numEntries
+```
+
+Specifies new gamma correction values to be used by the hardware. The default implement does nothing but return `self`. Subclasses that support multiple gamma correction transforms must override this method so that it sets the hardware to reflect the values in *table*.
+
+Gamma correction is necessary because displays respond nonlinearly to linear ranges of voltage. For example, consider a pixel that can have red, green, and blue values between 0 and 15. This pixel's brightness when the values are (7, 0, 0) might be more than 7/15 its brightness when the values are (15, 0, 0). Gamma correction lets the hardware adjust the voltage of the beam--for example, using 6.5/15 of maximum voltage instead of 7/15, so that the pixel isn't too bright.
+
+Each entry in *table* specifies the gamma correction (a value scaled to be between 0 and 255, inclusive) for the corresponding pixel component values. For example, for RGB color modes, `table[7]` specifies the gamma corrections for a red value of 7, a green value of 7, and a blue value of 7 (using one byte of the entry per component). If a pixel's value is (0, 5, 15), for example, the hardware should use the red gamma correction from `table[0]`, the green gamma correction from `table[5]`, and the blue gamma correction from `table[15]`. Which bytes you use from each table entry depends on whether the transfer table is for a color or black-and-white mode; you can determine the mode from the value of *numEntries*.
+
+When *numEntries* is `IO_2BPP_TRANSFER_TABLE_SIZE` or `IO_8BPP_TRANSFER_TABLE_SIZE` (as defined in the header file driverkit/displayDefs.h), the table is for a black-and-white display. In this case, each table entry has only one meaningful byte: the least significant byte.
+
+When *numEntries* is `IO_12BPP_TRANSFER_TABLE_SIZE`, `IO_15BPP_TRANSFER_TABLE_SIZE`, or `IO_24BPP_TRANSFER_TABLE_SIZE`, the table is for an RGB display, and each entry has three meaningful bytes. The most significant byte holds the red gamma correction, the next most significant byte holds the green gamma correction, and the next holds the blue gamma correction. The least significant byte holds no information.
+
+(See the original specification for detailed code examples of implementing gamma correction.)
+
+Gamma correction transforms are set using the setframebuffertransfer PostScript operator. The Window Server uses the functions specified in setframebuffertransfer to fill the values used in *table*. It then passes the values down the display system so that eventually the `setTransferTable:count:` message is invoked.
+
+**Note:** The default transfer table cannot be specified using NetInfo, despite the claims of the setframebuffertransfer documentation.
+
+**See also:** setframebuffertransfer PostScript Operator (NEXTSTEP General Reference)
+
+##### showCursor:frame:token:
+
+```objc
+- showCursor:(Point *)cursorLoc
+       frame:(int)frame
+       token:(int)token
+```
+
+Implements this method, as described in the IOScreenEvents protocol specification. You should never need to invoke or implement this method.
+
+---
+
+### IONetbufQueue
+
+**Inherits From:** Object
+
+**Declared In:** driverkit/IONetbufQueue.h
+
+#### Class Description
+
+IONetbufQueue is used by network device drivers to store packets until they're transmitted. IONetbufQueue is a first-in first-out (FIFO) queue.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Creating and initializing instances**
+- `– initWithMaxCount:`
+
+**Adding and removing netbufs from the queue**
+- `– enqueue:`
+- `– dequeue`
+
+**Getting the size of the queue**
+- `– count`
+- `– maxCount`
+
+#### Instance Methods
+
+##### count
+
+```objc
+- (unsigned int)count
+```
+
+Returns the number of netbufs in the IONetbufQueue.
+
+**See also:** `– maxCount`
+
+##### dequeue
+
+```objc
+- (netbuf_t)dequeue
+```
+
+Removes and returns the netbuf that has been in the queue the longest. Returns NULL if no netbufs are in the queue.
+
+##### enqueue:
+
+```objc
+- (void)enqueue:(netbuf_t)netbuf
+```
+
+Adds the specified netbuf to the queue, unless the queue already has reached its maximum length. If the queue is at its maximum length, the netbuf is freed.
+
+**See also:** `– count`, `– maxCount`
+
+##### initWithMaxCount:
+
+```objc
+- initWithMaxCount:(unsigned int)maxCount
+```
+
+Initializes and returns a newly allocated IONetbufQueue. The maximum number of netbufs in the queue is set to *maxCount*.
+
+##### maxCount
+
+```objc
+- (unsigned int)maxCount
+```
+
+Returns the maximum number of netbufs that can be in the IONetbufQueue. This number is set at initialization time.
+
+**See also:** `– maxCount`, `– initWithMaxCount:`
+
+---
+
+### IONetwork
+
+**Inherits From:** Object
+
+**Declared In:** driverkit/IONetwork.h
+
+#### Class Description
+
+The IONetwork class connects direct drivers, such as Ethernet drivers, into the kernel network interface. One IONetwork object is associated with each instance of a network direct driver. In the future, support may be added for indirect network drivers, as well.
+
+Network direct drivers must implement the IONetworkDeviceMethods protocol, so that the IONetwork can send them messages.
+
+**Note:** Network drivers must run in the kernel.
+
+See the IOEthernet specification for information on how to write Ethernet drivers, and the IOTokenRing specification for information on writing Token Ring drivers. See Chapter 8, "Network Modules," in NEXTSTEP Operating System Software for more information about network drivers.
+
+#### Instance Variables
+
+None declared.
+
+#### Method Types
+
+**Initializing an IONetwork instance**
+- `– initForNetworkDevice:name:unit:type:maxTransferUnit:flags:`
+- `– finishInitialization`
+
+**Passing packets from the driver up to the protocol stack**
+- `– handleInputPacket:extra:`
+
+**Outputting a packet**
+- `– outputPacket:address:`
+
+**Performing a command**
+- `– performCommand:data:`
+
+**Allocating a network buffer**
+- `– allocateNetbuf`
+
+**Keeping statistics**
+- `– collisions`
+- `– incrementCollisions`
+- `– incrementCollisionsBy:`
+- `– incrementInputErrors`
+- `– incrementInputErrorsBy:`
+- `– incrementInputPackets`
+- `– incrementInputPacketsBy:`
+- `– incrementOutputErrors`
+- `– incrementOutputErrorsBy:`
+- `– incrementOutputPackets`
+- `– incrementOutputPacketsBy:`
+- `– inputErrors`
+- `– inputPackets`
+- `– outputErrors`
+- `– outputPackets`
+
+#### Instance Methods
+
+##### allocateNetbuf
+
+```objc
+- (netbuf_t)allocateNetbuf
+```
+
+This method creates and returns a netbuf to be used for an impending output.
+
+This method doesn't always have to return a buffer. For example, you might want to limit the number of buffers your driver instance can allocate (say, 200 kilobytes worth) so that it won't use too much wired-down kernel memory. When this method fails to return a buffer, it should return NULL.
+
+Here's an example of implementing allocateNetbuf:
+
+```objc
+#define my_HDR_SIZE    14
+#define my_MTU        1500
+#define my_MAX_PACKET  (my_HDR_SIZE + my_MTU)
+
+- netbuf_t allocateNetbuf
+{
+    if (_numbufs == _maxNumbufs)
+        return(NULL);
+    else {
+        _numbufs++;
+        return(nb_alloc(my_MAX_PACKET));
+    }
+}
+```
+
+**See also:** nb_alloc() (NEXTSTEP Operating System Software)
+
+##### collisions
+
+```objc
+- (unsigned int)collisions
+```
+
+Returns the total number of network packet collisions that have been detected since boot time.
+
+##### finishInitialization
+
+```objc
+- (int)finishInitialization
+```
+
+This method should perform any initialization that hasn't already been done. For example, it should make sure its hardware is ready to run. You can specify what the integer return value (if any) should be.
+
+If you implement this method, you need to check that `[self isRunning] == YES`.
+
+##### handleInputPacket:extra:
+
+```objc
+- (int)handleInputPacket:(netbuf_t)packet
+                   extra:(void *)extra
+```
+
+Increments the number of input packets and passes *packet* to the kernel for processing. The kernel dispatches the packet to the appropriate protocol handler.
+
+A network device driver should invoke this method after it's processed a newly received packet. The value of *extra* should be zero, unless the protocol handler requires another value. For instance, token ring drivers need to return a valid pointer to a token ring header. This method returns `EAFNOSUPPORT` if no protocol handler accepts the packet; otherwise, it returns zero.
+
+##### incrementCollisions
+
+```objc
+- (void)incrementCollisions
+```
+
+Increments by one the total number of network packet collisions that have been detected since boot time.
+
+##### incrementCollisionsBy:
+
+```objc
+- (void)incrementCollisionsBy:(unsigned int)increment
+```
+
+Increments by *increment* the total number of network packet collisions that have been detected since boot time.
+
+##### incrementInputErrors
+
+```objc
+- (void)incrementInputErrors
+```
+
+Increments by one the total number of packet input errors that have been detected since boot time.
+
+##### incrementInputErrorsBy:
+
+```objc
+- (void)incrementInputErrorsBy:(unsigned int)increment
+```
+
+Increments by *increment* the total number of packet input errors that have been detected since boot time.
+
+##### incrementInputPackets
+
+```objc
+- (void)incrementInputPackets
+```
+
+Increments by one the total number of packets that have been received by the computer since boot time. You usually don't need to invoke this method because `handleInputPacket:extra:` does so for you.
+
+##### incrementInputPacketsBy:
+
+```objc
+- (void)incrementInputPacketsBy:(unsigned int)increment
+```
+
+Increments by *increment* the total number of packets that have been received by the computer since boot time.
+
+##### incrementOutputErrors
+
+```objc
+- (void)incrementOutputErrors
+```
+
+Increments by one the total number of packet output errors that have been detected since boot time.
+
+##### incrementOutputErrorsBy:
+
+```objc
+- (void)incrementOutputErrorsBy:(unsigned int)increment
+```
+
+Increments by *increment* the total number of packet output errors that have been detected since boot time.
+
+##### incrementOutputPackets
+
+```objc
+- (void)incrementOutputPackets
+```
+
+Increments by one the total number of packets that have been transmitted by the computer since boot time.
+
+##### incrementOutputPacketsBy:
+
+```objc
+- (void)incrementOutputPacketsBy:(unsigned int)increment
+```
+
+Increments by *increment* the total number of packets that have been transmitted by the computer since boot time.
+
+##### initForNetworkDevice:name:unit:type:maxTransferUnit:flags:
+
+```objc
+- initForNetworkDevice:device
+                  name:(const char *)name
+                  unit:(unsigned int)unit
+                  type:(const char *)type
+     maxTransferUnit:(unsigned int)mtu
+                 flags:(unsigned int)flags
+```
+
+Initializes and returns the IONetwork instance associated with the specified direct device driver *device*. This method connects *device* into the kernel's networking subsystem. It's typically called from a network driver's implementation of `initFromDeviceDescription`. You shouldn't invoke `initForNetworkDevice:...` directly. IOEthernet and IOTokenRing invoke this method on behalf of their subclasses and return an IONetwork object in their respective `attachToNetworkWithAddress:` methods.
+
+The *name* argument should be set to a constant string that names this type of network device. For example, Ethernet drivers are named "en", and Token Ring drivers are named "tr". The *unit* is an integer greater than or equal to zero that's unique for *name*. For example, the first instance of an Ethernet driver is unit 0, the second is unit 1, and so on.
+
+The *type* is a constant string that describes this module. For example, Ethernet drivers supply the constant `IFTYPE_ETHERNET` (which is defined in net/etherdefs.h to be "10MB Ethernet").
+
+The *mtu* is the maximum amount of data your module can send or receive. For example, Ethernet drivers use the value `ETHERMTU`, which is defined in the header file net/etherdefs.h as 1500.
+
+Finally, *flags* defines the initial flags for the interface. Possible values are:
+
+- **IFF_UP:** If true, this interface is working.
+- **IFF_BROADCAST:** If true, this interface supports broadcast.
+- **IFF_LOOPBACK:** If true, this interface is local only.
+- **IFF_POINTTOPOINT:** If true, this is a point-to-point interface.
+
+##### inputErrors
+
+```objc
+- (unsigned int)inputErrors
+```
+
+Returns the total number of packet input errors that have been detected since boot time.
+
+##### inputPackets
+
+```objc
+- (unsigned int)inputPackets
+```
+
+Returns the total number of packets that have been received by the computer since boot time.
+
+##### outputErrors
+
+```objc
+- (unsigned int)outputErrors
+```
+
+Returns the total number of packet output errors that have been detected since boot time.
+
+##### outputPacket:address:
+
+```objc
+- (int)outputPacket:(netbuf_t)packet
+            address:(void *)address
+```
+
+This method should deliver the specified packet to the given address. Its return value should be zero if no error occurred; otherwise, return an error number from the header file sys/errno.h.
+
+If you implement this method, you need to check that `[self isRunning] == YES`. If so, insert the necessary hardware addresses into the packet and check it for minimum length requirements.
+
+##### outputPackets
+
+```objc
+- (unsigned int)outputPackets
+```
+
+Returns the total number of packets that have been transmitted by the computer since boot time.
+
+##### performCommand:data:
+
+```objc
+- (int)performCommand:(const char *)command
+                 data:(void *)data
+```
+
+This method performs arbitrary control operations; the character string *command* is used to select between these operations. Although you don't have to implement any operations, there are five standard operations. You can also define your own operations.
+
+The standard commands are listed in the following table. The constant strings listed below are declared in the header file net/netif.h (under the bsd directory of /NextDeveloper/Headers).
+
+| Command | Operation |
+|---------|-----------|
+| `IFCONTROL_SETFLAGS` | Request to have interface flags turned on or off. The *data* argument for this command is of type union ifr_ifru (which is declared in the header file net/if.h). |
+| `IFCONTROL_SETADDR` | Set the address of the interface. |
+| `IFCONTROL_GETADDR` | Get the address of the interface. |
+| `IFCONTROL_AUTOADDR` | Automatically set the address of the interface. |
+| `IFCONTROL_UNIXIOCTL` | Perform a UNIX ioctl() command. This is only for compatibility; ioctl() isn't a recommended interface for network drivers. The argument is of type if_ioctl_t *, where the if_ioctl_t structure contains the UNIX ioctl request (for example, SIOCSIFADDR) in the ioctl_command field and the ioctl data in the ioctl_data field. |
+
+An example of implementing performCommand:data: follows.
+
+```objc
+- (int)performCommand:(const char *)command data:(void *)data
+{
+    int error = 0;
+
+    if (strcmp(command, IFCONTROL_SETFLAGS) == 0)
+        /* do nothing */;
+    else
+    if (strcmp(command, IFCONTROL_GETADDR) == 0)
+        bcopy(&my_address, data, sizeof(my_address));
+    else
+        error = EINVAL;
+
+    return (error);
+}
+```
+
+---
+
 ## See Also
 
 - Driver Kit Architecture documentation (Chapter 1)
