@@ -151,6 +151,10 @@
 3. [Support for Specific Devices](DriverKit/03_SpecificDevices.md)
 4. [Building, Configuring, and Debugging Drivers](DriverKit/04_BuildingConfiguring.md)
 5. [Driver Kit Reference](DriverKit/05_Reference.md)
+   - [Classes](DriverKit/05_Reference/Classes.md)
+   - [Functions](DriverKit/05_Reference/Functions.md)
+   - [Protocols](DriverKit/05_Reference/Protocols.md)
+   - [Types and Constants](DriverKit/05_Reference/Types.md)
 - [Appendix — Suggested Reading](DriverKit/Appendix_SuggestedReading.md) <!-- Missing -->
 
 ---
