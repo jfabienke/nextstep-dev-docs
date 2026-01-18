@@ -163,6 +163,7 @@
 ### [Foundation](Foundation/)
 
 - [Introduction](Foundation/Introduction.md) <!-- Missing -->
+1. [The Foundation Kit](Foundation/01_FoundationKit.md)
 
 #### Classes
 - [NSArchiver](Foundation/Classes/NSArchiver.md) <!-- Missing -->
