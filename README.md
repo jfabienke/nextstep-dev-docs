@@ -184,10 +184,10 @@
 - [NSNumber](Foundation/Classes/NSNumber.md)
 - [NSObject](Foundation/Classes/NSObject.md)
 - [NSScanner](Foundation/Classes/NSScanner.md)
-- [NSString Class Cluster](Foundation/Classes/NSStringClassCluster.md) <!-- Missing -->
-- [NSTimeZone Class Cluster](Foundation/Classes/NSTimeZoneClassCluster.md) <!-- Missing -->
-- [NSUnarchiver](Foundation/Classes/NSUnarchiver.md) <!-- Missing -->
-- [NSValue](Foundation/Classes/NSValue.md) <!-- Missing -->
+- [NSString Class Cluster](Foundation/Classes/NSStringClassCluster.md)
+- [NSTimeZone Class Cluster](Foundation/Classes/NSTimeZoneClassCluster.md)
+- [NSUnarchiver](Foundation/Classes/NSUnarchiver.md)
+- [NSValue](Foundation/Classes/NSValue.md)
 
 #### Functions
 - [NSAllocateObject / NSDeallocateObject](Foundation/Functions/FoundationFunctions.md) <!-- Missing -->
