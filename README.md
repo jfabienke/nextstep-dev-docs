@@ -243,3 +243,6 @@
 - [Operating System](ReleaseNotes/OperatingSystem.md)
 - [Preferences](ReleaseNotes/Preferences.md)
 - [Preprocessor](ReleaseNotes/Preprocessor.md)
+- [Project Builder](ReleaseNotes/ProjectBuilder.md)
+- [Sound Kit](ReleaseNotes/SoundKit.md)
+- [Sound Library](ReleaseNotes/SoundLibrary.md)
