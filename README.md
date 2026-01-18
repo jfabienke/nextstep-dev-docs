@@ -190,8 +190,8 @@
 - [NSValue](Foundation/Classes/NSValue.md)
 
 #### Functions
-- [NSAllocateObject / NSDeallocateObject](Foundation/Functions/FoundationFunctions.md) <!-- Missing -->
-- [Living in a Hybrid World](Foundation/HybridWorld.md) <!-- Missing -->
+- [Foundation Kit Functions](Foundation/Functions/FoundationFunctions.md)
+- [Living in a Hybrid World](Foundation/HybridWorld.md)
 
 #### Protocols
 - [NSCoding](Foundation/Protocols/NSCoding.md) <!-- Missing -->
