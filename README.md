@@ -48,7 +48,7 @@ The original documentation is copyrighted material now owned by Apple Inc. (thro
 - [Introduction](Concepts/DatabaseKit/Introduction.md)
 1. [Overview](Concepts/DatabaseKit/01_Overview.md)
 2. [Entity-Relationship Modeling](Concepts/DatabaseKit/02_ERModeling.md)
-3. [Database Models](Concepts/DatabaseKit/03_Models.md) <!-- Missing -->
+3. [Database Models](Concepts/DatabaseKit/03_Models.md)
 4. [Creating a Database Project](Concepts/DatabaseKit/04_Creating_Database_Project.md)
 5. [Database Kit Classes and Protocols](Concepts/DatabaseKit/05_Database_Kit_Classes_And_Protocols.md)
 6. [Model Emulation](Concepts/DatabaseKit/06_Model_Emulation.md)
@@ -60,7 +60,7 @@ The original documentation is copyrighted material now owned by Apple Inc. (thro
 - [Appendix A — Adapter Default Parameters](Concepts/DatabaseKit/Appendix_A_Adaptor_Default_Parameters.md)
 
 #### Other Concepts
-- [Exception Handling](Concepts/ExceptionHandling.md) <!-- Missing -->
+- [Exception Handling](Concepts/ExceptionHandling.md)
 - [Preparing Fonts](Concepts/FontPreparation/01_Preparing_Fonts.md)
 - [Preparing an Application for Installation by the Installer](DevTools/Installer/01_Preparing_Application_For_Installation.md)
 - [Localization](Concepts/Localization/01_Localization.md)
@@ -112,7 +112,7 @@ The original documentation is copyrighted material now owned by Apple Inc. (thro
 - [Important Information](Concepts/Pre3.0_Concepts/00_Intro.md)
 1. [System Overview](Concepts/Pre3.0_Concepts/01_System_Overview.md)
 2. [The NeXT User Interface](Concepts/Pre3.0_Concepts/02_User_Interface.md)
-3. [Object-Oriented Programming and Objective C](Concepts/Pre3.0_Concepts/03_ObjC.md) <!-- Missing -->
+3. [Object-Oriented Programming and Objective C](Concepts/Pre3.0_Concepts/03_ObjC.md)
 4. [Drawing](Concepts/Pre3.0_Concepts/04_Drawing.md)
 5. [Events](Concepts/Pre3.0_Concepts/05_Events.md)
 6. [Program Structure](Concepts/Pre3.0_Concepts/06_ProgStructure.md)
@@ -177,7 +177,7 @@ The original documentation is copyrighted material now owned by Apple Inc. (thro
    - [Protocols](DriverKit/05_Reference/Protocols.md)
    - [Types and Constants](DriverKit/05_Reference/Types.md)
    - [More Types and Constants](DriverKit/05_Reference/MoreTypesAndConstants.md)
-- [Appendix — Suggested Reading](DriverKit/Appendix_SuggestedReading.md) <!-- Missing -->
+- [Appendix — Suggested Reading](DriverKit/Appendix_SuggestedReading.md)
 
 ---
 
