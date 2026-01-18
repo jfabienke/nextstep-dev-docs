@@ -219,4 +219,6 @@
 - [Compiler Tools](ReleaseNotes/CompilerTools.md)
 - [Database Kit](ReleaseNotes/DatabaseKit.md)
 - [Debugger (GDB)](ReleaseNotes/Debugger.md)
+- [Distributed Objects](ReleaseNotes/DistributedObjects.md)
+- [Documentation](ReleaseNotes/Documentation.md)
 - [Objective C++](ReleaseNotes/ObjectiveCPlusPlus.md)
