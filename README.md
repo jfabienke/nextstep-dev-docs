@@ -212,6 +212,7 @@
 ### [Release Notes](ReleaseNotes/)
 
 - [Contents](ReleaseNotes/00_Contents.md)
+- [Developer Preamble](ReleaseNotes/DeveloperPreamble.md)
 - [ANSI C Libraries](ReleaseNotes/ANSICLibraries.md)
 - [Application Kit](ReleaseNotes/ApplicationKit.md)
 - [C Compiler](ReleaseNotes/CCompiler.md)
