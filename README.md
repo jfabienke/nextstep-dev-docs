@@ -241,3 +241,5 @@
 - [Objective C++](ReleaseNotes/ObjectiveCPlusPlus.md)
 - [Object Links](ReleaseNotes/ObjectLinks.md)
 - [Operating System](ReleaseNotes/OperatingSystem.md)
+- [Preferences](ReleaseNotes/Preferences.md)
+- [Preprocessor](ReleaseNotes/Preprocessor.md)
