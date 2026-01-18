@@ -217,3 +217,5 @@
 - [C Compiler](ReleaseNotes/CCompiler.md)
 - [C Library Support for Localization](ReleaseNotes/CLibraryLocalization.md)
 - [Compiler Tools](ReleaseNotes/CompilerTools.md)
+- [Database Kit](ReleaseNotes/DatabaseKit.md)
+- [Objective C++](ReleaseNotes/ObjectiveCPlusPlus.md)
