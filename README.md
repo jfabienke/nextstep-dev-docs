@@ -181,9 +181,9 @@
 - [NSException](Foundation/Classes/NSException.md)
 - [NSNotificationCenter](Foundation/Classes/NSNotificationCenter.md)
 - [NSNotification Class Cluster](Foundation/Classes/NSNotificationClassCluster.md)
-- [NSNumber](Foundation/Classes/NSNumber.md) <!-- Missing -->
-- [NSObject](Foundation/Classes/NSObject.md) <!-- Missing -->
-- [NSScanner](Foundation/Classes/NSScanner.md) <!-- Missing -->
+- [NSNumber](Foundation/Classes/NSNumber.md)
+- [NSObject](Foundation/Classes/NSObject.md)
+- [NSScanner](Foundation/Classes/NSScanner.md)
 - [NSString Class Cluster](Foundation/Classes/NSStringClassCluster.md) <!-- Missing -->
 - [NSTimeZone Class Cluster](Foundation/Classes/NSTimeZoneClassCluster.md) <!-- Missing -->
 - [NSUnarchiver](Foundation/Classes/NSUnarchiver.md) <!-- Missing -->
