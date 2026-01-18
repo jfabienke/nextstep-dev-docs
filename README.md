@@ -162,7 +162,7 @@
 
 ### [Foundation](Foundation/)
 
-- [Introduction](Foundation/Introduction.md) <!-- Missing -->
+- [Introduction](Foundation/Introduction.md)
 1. [The Foundation Kit](Foundation/01_FoundationKit.md)
 
 #### Classes
