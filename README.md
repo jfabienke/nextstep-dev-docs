@@ -175,8 +175,8 @@
 - [NSCharacterSet Class Cluster](Foundation/Classes/NSCharacterSetClassCluster.md)
 - [NSCoder](Foundation/Classes/NSCoder.md)
 - [NSData Class Cluster](Foundation/Classes/NSDataClassCluster.md) <!-- Missing -->
-- [NSDate Class Cluster](Foundation/Classes/NSDateClassCluster.md) <!-- Missing -->
-- [NSDictionary Class Cluster](Foundation/Classes/NSDictionaryClassCluster.md) <!-- Missing -->
+- [NSDate Class Cluster](Foundation/Classes/NSDateClassCluster.md)
+- [NSDictionary Class Cluster](Foundation/Classes/NSDictionaryClassCluster.md)
 - [NSEnumerator](Foundation/Classes/NSEnumerator.md) <!-- Missing -->
 - [NSException](Foundation/Classes/NSException.md) <!-- Missing -->
 - [NSNotificationCenter](Foundation/Classes/NSNotificationCenter.md) <!-- Missing -->
