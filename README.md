@@ -171,9 +171,9 @@
 - [NSAssertionHandler](Foundation/Classes/NSAssertionHandler.md)
 - [NSAutoreleasePool](Foundation/Classes/NSAutoreleasePool.md)
 - [NSBundle](Foundation/Classes/NSBundle.md)
-- [NSCalendarDate](Foundation/Classes/NSCalendarDate.md) <!-- Missing -->
-- [NSCharacterSet Class Cluster](Foundation/Classes/NSCharacterSetClassCluster.md) <!-- Missing -->
-- [NSCoder](Foundation/Classes/NSCoder.md) <!-- Missing -->
+- [NSCalendarDate](Foundation/Classes/NSCalendarDate.md)
+- [NSCharacterSet Class Cluster](Foundation/Classes/NSCharacterSetClassCluster.md)
+- [NSCoder](Foundation/Classes/NSCoder.md)
 - [NSData Class Cluster](Foundation/Classes/NSDataClassCluster.md) <!-- Missing -->
 - [NSDate Class Cluster](Foundation/Classes/NSDateClassCluster.md) <!-- Missing -->
 - [NSDictionary Class Cluster](Foundation/Classes/NSDictionaryClassCluster.md) <!-- Missing -->
