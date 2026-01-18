@@ -239,3 +239,5 @@
 - [NetInfo Kit](ReleaseNotes/NetInfoKit.md)
 - [Objective C Run-Time System](ReleaseNotes/ObjectiveCRuntime.md)
 - [Objective C++](ReleaseNotes/ObjectiveCPlusPlus.md)
+- [Object Links](ReleaseNotes/ObjectLinks.md)
+- [Operating System](ReleaseNotes/OperatingSystem.md)
