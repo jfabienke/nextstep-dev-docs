@@ -211,7 +211,9 @@
 
 ### [Release Notes](ReleaseNotes/)
 
+- [Contents](ReleaseNotes/00_Contents.md)
 - [ANSI C Libraries](ReleaseNotes/ANSICLibraries.md)
 - [Application Kit](ReleaseNotes/ApplicationKit.md)
+- [C Compiler](ReleaseNotes/CCompiler.md)
 - [C Library Support for Localization](ReleaseNotes/CLibraryLocalization.md)
 - [Compiler Tools](ReleaseNotes/CompilerTools.md)
