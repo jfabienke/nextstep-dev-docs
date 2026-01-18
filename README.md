@@ -281,4 +281,4 @@ The original documentation is copyrighted material now owned by Apple Inc. (thro
 Historical research exploring the people and decisions behind NeXTSTEP development.
 
 - [Who Architected NeXT's Memory Management System?](Research/MemoryManagementArchitects.md) — Research into the origins of retain/release/autorelease, based on Computer History Museum oral histories and patent records. Concludes that Blaine Garst, Bertrand Serlet, Ali Ozer, and Trey Matteson co-designed the system.
-- [Who Designed the NeXTdimension Board?](Research/NeXTdimensionArchitects.md) — Incomplete research into the i860-based graphics accelerator board. Identifies Rich Page (hardware) and George Crow (analog) as leaders, but specific engineers remain undocumented in public sources.
+- [Rich Page: Architect of the NeXTdimension](Research/RichPage_NeXTdimension.md) — Complete research into the i860-based graphics accelerator board. Rich Page was the primary architect, advocating for the i860 processor and 32-bit color with alpha channel. Based on CHM oral histories parts 1 & 2.

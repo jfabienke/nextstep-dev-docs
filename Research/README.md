@@ -16,23 +16,25 @@ This directory contains historical research documents exploring the people, deci
 
 Based on Computer History Museum oral histories and US Patent 7716450B2 (filed 1995).
 
-### NeXTdimensionArchitects.md
+### RichPage_NeXTdimension.md *(Complete)*
 
 **Question:** Who designed the NeXTdimension graphics accelerator board?
 
-**Answer:** Incomplete — specific engineers not definitively identified.
+**Answer:** **Rich Page** — Primary architect of the NeXTdimension.
 
-**What we know:**
-- **Rich Page** (VP Digital Hardware Engineering) led all hardware development
-- **George Crow** (VP Analog Hardware Engineering) handled video/analog circuitry
-- **Avie Tevanian's** team likely oversaw the Mach kernel port to i860
+Page's key contributions:
+- Selected the Intel i860 processor ("Cray on a chip")
+- Advocated for 32-bit color with 8-bit alpha channel
+- Designed the coprocessor architecture with dedicated Mach kernel
+- Led the NRW (NeXT RISC Workstation) follow-on project
 
-**What remains unknown:**
-- The specific engineer(s) who designed the i860-based graphics architecture
-- Who ported the Mach kernel to the i860 processor
-- Who worked on Display PostScript acceleration (never completed)
+The board never reached its potential due to the i860's programming difficulty — the software team couldn't port full Display PostScript to it. This "cultural rift" between Page's hardware team and Tevanian's software team explains why hardware attribution was harder to find than software attribution.
 
-Unlike the Foundation Kit where patents and oral histories provided clear attribution, the NeXTdimension's designers remain undocumented in publicly available sources. The document includes recommendations for further research.
+Based on Computer History Museum oral histories, parts 1 & 2 (CHM 102780988, 102740462).
+
+### NeXTdimensionArchitects.md *(Superseded)*
+
+Initial research document before Rich Page oral history Part 2 was discovered. Kept for reference on research methodology. See RichPage_NeXTdimension.md for complete findings.
 
 ---
 
