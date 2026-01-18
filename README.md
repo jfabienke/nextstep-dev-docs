@@ -273,3 +273,11 @@ The original documentation is copyrighted material now owned by Apple Inc. (thro
 - [Window Server](ReleaseNotes/WindowServer.md)
 - [Workspace Manager](ReleaseNotes/WorkspaceManager.md)
 - [3D Graphics Kit](ReleaseNotes/3DGraphicsKit.md)
+
+---
+
+### [Research](Research/)
+
+Historical research exploring the people and decisions behind NeXTSTEP development.
+
+- [Who Architected NeXT's Memory Management System?](Research/MemoryManagementArchitects.md) — Research into the origins of retain/release/autorelease, based on Computer History Museum oral histories and patent records. Concludes that Blaine Garst, Bertrand Serlet, Ali Ozer, and Trey Matteson co-designed the system.
