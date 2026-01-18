@@ -225,4 +225,8 @@
 - [Edit](ReleaseNotes/Edit.md)
 - [Emacs and vi](ReleaseNotes/EmacsAndVi.md)
 - [Event Status Driver](ReleaseNotes/EventStatusDriver.md)
+- [Fat Files (Multiple Architecture Binaries)](ReleaseNotes/FatFiles.md)
+- [Fax](ReleaseNotes/Fax.md)
+- [GNU Source Code](ReleaseNotes/GNUSource.md)
+- [Header Files](ReleaseNotes/HeaderFiles.md)
 - [Objective C++](ReleaseNotes/ObjectiveCPlusPlus.md)
