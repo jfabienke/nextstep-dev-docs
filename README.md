@@ -229,4 +229,8 @@
 - [Fax](ReleaseNotes/Fax.md)
 - [GNU Source Code](ReleaseNotes/GNUSource.md)
 - [Header Files](ReleaseNotes/HeaderFiles.md)
+- [Installer](ReleaseNotes/Installer.md)
+- [Interface Builder](ReleaseNotes/InterfaceBuilder.md)
+- [libg++](ReleaseNotes/Libgxx.md)
+- [Loadable Kernel Servers](ReleaseNotes/LoadableKernelServers.md)
 - [Objective C++](ReleaseNotes/ObjectiveCPlusPlus.md)
