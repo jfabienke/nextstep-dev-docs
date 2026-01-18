@@ -16,6 +16,24 @@ This directory contains historical research documents exploring the people, deci
 
 Based on Computer History Museum oral histories and US Patent 7716450B2 (filed 1995).
 
+### NeXTdimensionArchitects.md
+
+**Question:** Who designed the NeXTdimension graphics accelerator board?
+
+**Answer:** Incomplete — specific engineers not definitively identified.
+
+**What we know:**
+- **Rich Page** (VP Digital Hardware Engineering) led all hardware development
+- **George Crow** (VP Analog Hardware Engineering) handled video/analog circuitry
+- **Avie Tevanian's** team likely oversaw the Mach kernel port to i860
+
+**What remains unknown:**
+- The specific engineer(s) who designed the i860-based graphics architecture
+- Who ported the Mach kernel to the i860 processor
+- Who worked on Display PostScript acceleration (never completed)
+
+Unlike the Foundation Kit where patents and oral histories provided clear attribution, the NeXTdimension's designers remain undocumented in publicly available sources. The document includes recommendations for further research.
+
 ---
 
 ## Methodology
