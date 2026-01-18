@@ -246,3 +246,7 @@
 - [Project Builder](ReleaseNotes/ProjectBuilder.md)
 - [Sound Kit](ReleaseNotes/SoundKit.md)
 - [Sound Library](ReleaseNotes/SoundLibrary.md)
+- [Tablet Driver](ReleaseNotes/TabletDriver.md)
+- [Window Server](ReleaseNotes/WindowServer.md)
+- [Workspace Manager](ReleaseNotes/WorkspaceManager.md)
+- [3D Graphics Kit](ReleaseNotes/3DGraphicsKit.md)
