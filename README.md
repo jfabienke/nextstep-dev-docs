@@ -221,4 +221,8 @@
 - [Debugger (GDB)](ReleaseNotes/Debugger.md)
 - [Distributed Objects](ReleaseNotes/DistributedObjects.md)
 - [Documentation](ReleaseNotes/Documentation.md)
+- [DSP](ReleaseNotes/DSP.md)
+- [Edit](ReleaseNotes/Edit.md)
+- [Emacs and vi](ReleaseNotes/EmacsAndVi.md)
+- [Event Status Driver](ReleaseNotes/EventStatusDriver.md)
 - [Objective C++](ReleaseNotes/ObjectiveCPlusPlus.md)
