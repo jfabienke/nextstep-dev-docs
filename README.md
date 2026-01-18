@@ -5,6 +5,27 @@
 
 ---
 
+## About This Repository
+
+This repository exists to **preserve computing history** and keep documentation for legacy platforms accessible to future generations. NeXTSTEP 3.3 (1994) was a groundbreaking operating system that laid the foundation for modern macOS and iOS development. The concepts introduced here—Objective-C, Foundation Kit, Interface Builder, and object-oriented frameworks—continue to influence software development today.
+
+The original documentation, published by NeXT Computer, Inc., has been carefully converted from its original format into Markdown to ensure it remains readable and searchable in modern development environments. This conversion makes historical technical knowledge available to:
+
+- **Computer historians** studying the evolution of operating systems and development tools
+- **Educators** teaching the history of software engineering and object-oriented programming
+- **Developers** curious about the origins of modern Apple frameworks
+- **Retrocomputing enthusiasts** maintaining and developing for legacy NeXT hardware
+
+### Intellectual Property Notice
+
+**Copyright ©1994 by NeXT Computer, Inc. All Rights Reserved.**
+
+The original documentation is copyrighted material now owned by Apple Inc. (through their acquisition of NeXT in 1997). This repository is maintained for **historical preservation and educational purposes only**. No copyright infringement is intended.
+
+**To Apple Inc.:** If you have any concerns or objections regarding this repository, please contact me directly and I will promptly take it down. My intent is solely to preserve computing history, not to infringe on your intellectual property rights.
+
+---
+
 ## Contents
 
 ### [Assembler](Assembler/)
