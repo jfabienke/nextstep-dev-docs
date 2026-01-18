@@ -177,10 +177,10 @@
 - [NSData Class Cluster](Foundation/Classes/NSDataClassCluster.md) <!-- Missing -->
 - [NSDate Class Cluster](Foundation/Classes/NSDateClassCluster.md)
 - [NSDictionary Class Cluster](Foundation/Classes/NSDictionaryClassCluster.md)
-- [NSEnumerator](Foundation/Classes/NSEnumerator.md) <!-- Missing -->
-- [NSException](Foundation/Classes/NSException.md) <!-- Missing -->
-- [NSNotificationCenter](Foundation/Classes/NSNotificationCenter.md) <!-- Missing -->
-- [NSNotification Class Cluster](Foundation/Classes/NSNotificationClassCluster.md) <!-- Missing -->
+- [NSEnumerator](Foundation/Classes/NSEnumerator.md)
+- [NSException](Foundation/Classes/NSException.md)
+- [NSNotificationCenter](Foundation/Classes/NSNotificationCenter.md)
+- [NSNotification Class Cluster](Foundation/Classes/NSNotificationClassCluster.md)
 - [NSNumber](Foundation/Classes/NSNumber.md) <!-- Missing -->
 - [NSObject](Foundation/Classes/NSObject.md) <!-- Missing -->
 - [NSScanner](Foundation/Classes/NSScanner.md) <!-- Missing -->
