@@ -104,42 +104,42 @@
 
 ### [Developer Tools](DevTools/)
 
-- [Introduction](DevTools/00_Introduction.md) <!-- Missing -->
-1. [Putting Together a NEXTSTEP Application](DevTools/01_PuttingTogether.md) <!-- Missing -->
-2. [The Project Builder Application](DevTools/02_ProjectBuilder.md) <!-- Missing -->
-3. [The Interface Builder Application](DevTools/03_InterfaceBuilder.md) <!-- Missing -->
+- [Introduction](DevTools/00_Introduction.md)
+1. [Putting Together a NEXTSTEP Application](DevTools/01_PuttingTogether.md)
+2. [The Project Builder Application](DevTools/02_ProjectBuilder.md)
+3. [The Interface Builder Application](DevTools/03_InterfaceBuilder.md)
 
 #### New Interface Builder
-1. [Composing](DevTools/NewInterfaceBuilder/01_Composing.md) <!-- Missing -->
-2. [Setting Object Attributes](DevTools/NewInterfaceBuilder/02_ObjAttributes.md) <!-- Missing -->
-3. [Making and Managing Connections](DevTools/NewInterfaceBuilder/03_Connections.md) <!-- Missing -->
-4. [Creating a Class](DevTools/NewInterfaceBuilder/04_CreatingClass.md) <!-- Missing -->
-5. [Using Dynamic Palettes](DevTools/NewInterfaceBuilder/05_DynPalettes.md) <!-- Missing -->
-6. [Working With Multiple Nib Files](DevTools/NewInterfaceBuilder/06_MultipleNibs.md) <!-- Missing -->
+1. [Composing](DevTools/NewInterfaceBuilder/01_Composing.md)
+2. [Setting Object Attributes](DevTools/NewInterfaceBuilder/02_ObjAttributes.md)
+3. [Making and Managing Connections](DevTools/NewInterfaceBuilder/03_Connections.md)
+4. [Creating a Class](DevTools/NewInterfaceBuilder/04_CreatingClass.md)
+5. [Using Dynamic Palettes](DevTools/NewInterfaceBuilder/05_DynPalettes.md)
+6. [Working With Multiple Nib Files](DevTools/NewInterfaceBuilder/06_MultipleNibs.md)
 
 #### Applications
-- [The Edit Application](DevTools/04_Edit.md) <!-- Missing -->
-- [The Terminal Application](DevTools/05_Terminal.md) <!-- Missing -->
-- [The Icon Builder Application](DevTools/06_IconBuilder.md) <!-- Missing -->
-- [The DBModeler Application](DevTools/07_DBModeler.md) <!-- Missing -->
-- [The MallocDebug Application](DevTools/08_MallocDebug.md) <!-- Missing -->
-- [The Process Monitor Application](DevTools/09_ProcessMonitor.md) <!-- Missing -->
-- [The PostScript Previewers: Yap and pft](DevTools/10_YAP.md) <!-- Missing -->
+- [The Edit Application](DevTools/04_Edit.md)
+- [The Terminal Application](DevTools/05_Terminal.md)
+- [The Icon Builder Application](DevTools/06_IconBuilder.md)
+- [The DBModeler Application](DevTools/07_DBModeler.md)
+- [The MallocDebug Application](DevTools/08_MallocDebug.md)
+- [The Process Monitor Application](DevTools/09_ProcessMonitor.md)
+- [The PostScript Previewers: Yap and pft](DevTools/10_YAP.md)
 
 #### Compiler & Debugger
-- [The GNU C Compiler](DevTools/11_Compiler.md) <!-- Missing -->
-- [The GNU C Preprocessor](DevTools/12_Preprocessor.md) <!-- Missing -->
-- [The GNU Source-Level Debugger](DevTools/13_Debugger.md) <!-- Missing -->
-- [Mach Object Files](DevTools/14_MachO.md) <!-- Missing -->
+- [The GNU C Compiler](DevTools/11_Compiler.md)
+- [The GNU C Preprocessor](DevTools/12_Preprocessor.md)
+- [The GNU Source-Level Debugger](DevTools/13_Debugger.md)
+- [Mach Object Files](DevTools/14_MachO.md)
 
 #### Tutorials
-- [Building a Simple Application](DevTools/15_SimpleApp.md) <!-- Missing -->
-- [Building a One-Button Calculator](DevTools/16_CalculatorApp.md) <!-- Missing -->
-- [Building a Text Editor Using Multiple Nib Files](DevTools/17_TextApp.md) <!-- Missing -->
-- [Building a Custom Palette](DevTools/18_CustomPalette.md) <!-- Missing -->
+- [Building a Simple Application](DevTools/15_SimpleApp.md)
+- [Building a One-Button Calculator](DevTools/16_CalculatorApp.md)
+- [Building a Text Editor Using Multiple Nib Files](DevTools/17_TextApp.md)
+- [Building a Custom Palette](DevTools/18_CustomPalette.md)
 
 #### Appendices
-- [Appendix A — The Header Viewer Application](DevTools/AppendixA_HeaderViewer.md) <!-- Missing -->
+- [Appendix A — The Header Viewer Application](DevTools/AppendixA_HeaderViewer.md)
 
 ---
 
@@ -155,6 +155,7 @@
    - [Functions](DriverKit/05_Reference/Functions.md)
    - [Protocols](DriverKit/05_Reference/Protocols.md)
    - [Types and Constants](DriverKit/05_Reference/Types.md)
+   - [More Types and Constants](DriverKit/05_Reference/MoreTypesAndConstants.md)
 - [Appendix — Suggested Reading](DriverKit/Appendix_SuggestedReading.md) <!-- Missing -->
 
 ---
@@ -205,3 +206,12 @@
 ### [General Reference](GeneralReference/)
 
 - [Configuration Keys](GeneralReference/ConfigurationKeys.md)
+
+---
+
+### [Release Notes](ReleaseNotes/)
+
+- [ANSI C Libraries](ReleaseNotes/ANSICLibraries.md)
+- [Application Kit](ReleaseNotes/ApplicationKit.md)
+- [C Library Support for Localization](ReleaseNotes/CLibraryLocalization.md)
+- [Compiler Tools](ReleaseNotes/CompilerTools.md)
