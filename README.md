@@ -194,13 +194,13 @@
 - [Living in a Hybrid World](Foundation/HybridWorld.md)
 
 #### Protocols
-- [NSCoding](Foundation/Protocols/NSCoding.md) <!-- Missing -->
-- [NSCopying](Foundation/Protocols/NSCopying.md) <!-- Missing -->
-- [NSMutableCopying](Foundation/Protocols/NSMutableCopying.md) <!-- Missing -->
-- [NSObject Protocol](Foundation/Protocols/NSObject.md) <!-- Missing -->
+- [NSCoding](Foundation/Protocols/NSCoding.md)
+- [NSCopying](Foundation/Protocols/NSCopying.md)
+- [NSMutableCopying](Foundation/Protocols/NSMutableCopying.md)
+- [NSObject Protocol](Foundation/Protocols/NSObject.md)
 
 #### Types and Constants
-- [Defined Types](Foundation/TypesAndConstants/FoundationTypesAndConstants.md) <!-- Missing -->
+- [Foundation Kit Types and Constants](Foundation/TypesAndConstants/FoundationTypesAndConstants.md)
 
 ---
 
