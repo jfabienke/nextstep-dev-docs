@@ -166,11 +166,11 @@
 1. [The Foundation Kit](Foundation/01_FoundationKit.md)
 
 #### Classes
-- [NSArchiver](Foundation/Classes/NSArchiver.md) <!-- Missing -->
-- [NSArray Class Cluster](Foundation/Classes/NSArrayClassCluster.md) <!-- Missing -->
-- [NSAssertionHandler](Foundation/Classes/NSAssertionHandler.md) <!-- Missing -->
-- [NSAutoreleasePool](Foundation/Classes/NSAutoreleasePool.md) <!-- Missing -->
-- [NSBundle](Foundation/Classes/NSBundle.md) <!-- Missing -->
+- [NSArchiver](Foundation/Classes/NSArchiver.md)
+- [NSArray Class Cluster](Foundation/Classes/NSArrayClassCluster.md)
+- [NSAssertionHandler](Foundation/Classes/NSAssertionHandler.md)
+- [NSAutoreleasePool](Foundation/Classes/NSAutoreleasePool.md)
+- [NSBundle](Foundation/Classes/NSBundle.md)
 - [NSCalendarDate](Foundation/Classes/NSCalendarDate.md) <!-- Missing -->
 - [NSCharacterSet Class Cluster](Foundation/Classes/NSCharacterSetClassCluster.md) <!-- Missing -->
 - [NSCoder](Foundation/Classes/NSCoder.md) <!-- Missing -->
