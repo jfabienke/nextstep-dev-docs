@@ -1,13 +1,15 @@
 # Rich Page: Architect of the NeXTdimension
 
 **Research Date:** January 2026
-**Primary Source:** Rich Page oral history, parts 1 & 2 (CHM 102780988, 102740462)
+**Primary Sources:**
+- Rich Page oral history, parts 1 & 2 (CHM 102780988, 102740462)
+- Game Engine Black Book: DOOM (Fabien Sanglard, 2018)
 
 ---
 
 ## Summary
 
-**Rich Page** was the primary architect of the NeXTdimension (ND) board, NeXT's high-end graphics accelerator that shipped in 1991. The project represented his most ambitious hardware gamble at NeXT — an attempt to turn the NeXTcube into a world-class graphics workstation that could compete with Silicon Graphics (SGI).
+**Rich Page** was the primary architect of the NeXTdimension (ND) board, NeXT's high-end graphics accelerator that shipped in 1991. **Mike Paquette** wrote the custom kernel (GaCK) that ran on the i860 processor. The project represented Page's most ambitious hardware gamble at NeXT — an attempt to turn the NeXTcube into a world-class graphics workstation that could compete with Silicon Graphics (SGI).
 
 ---
 
@@ -23,6 +25,24 @@ Page led all hardware development at NeXT as co-founder and VP of Digital Hardwa
 - Designed the coprocessor architecture with dedicated memory
 - Led the NRW (NeXT RISC Workstation) follow-on project
 
+### Mike Paquette — GaCK Kernel Author
+
+**Mike Paquette** was the NeXT engineer who wrote the kernel that ran on the NeXTdimension's i860 processor.
+
+**Key Contributions:**
+- Wrote **GaCK** (Graphics aCcelerator Kernel) — the custom kernel for NeXTdimension
+- Created IOHIDevice code at NeXT (May 22, 1992)
+- Later became **Quartz architect** at Apple
+
+**From Game Engine Black Book: DOOM:**
+> "The NeXTdimension ran a custom kernel which was designed to do soft real-time management of multiple threads within a single address space... The kernel was called 'Graphics aCcelerator Kernel, or 'GaCK'. Yes, this was a jape at the funny capitalization of the company name. It was not Mach, or BSD, or Minix, or Linux."
+> — M Paquette, NeXT Engineer
+
+**Critical Correction:** Earlier accounts (including initial versions of this document) stated the NeXTdimension ran a "stripped-down Mach kernel." This is incorrect. GaCK was a completely custom kernel designed specifically for soft real-time graphics workloads.
+
+**Career Arc:**
+Paquette's work on GaCK directly informed his later role at Apple, where he spent "a decade re-creating Display PostScript as Quartz." The compositing architecture pioneered on the NeXTdimension became the foundation for macOS's window server.
+
 ---
 
 ## Technical Vision
@@ -34,7 +54,7 @@ Rich Page was a fierce advocate for the **Intel i860 RISC processor** (released 
 **The Vision:**
 Page didn't just want a graphics card — he wanted a **coprocessor**. The i860 on the ND board had:
 - Its own dedicated memory (up to 32 MB)
-- Its own stripped-down Mach kernel
+- Its own custom kernel (GaCK — written by Mike Paquette)
 - Independent execution capability
 
 **The Goal:**
@@ -215,14 +235,21 @@ Page was the **hardware counterpart** to the software architects — but hardwar
 
 ## Conclusion
 
-**Rich Page** was definitively the architect of the NeXTdimension board. His vision included:
-- Using the i860 as a true coprocessor running its own Mach kernel
+**Rich Page** was definitively the hardware architect of the NeXTdimension board, while **Mike Paquette** wrote the custom GaCK kernel that ran on the i860 processor.
+
+Page's vision included:
+- Using the i860 as a true coprocessor running its own kernel
 - 32-bit color with 8-bit alpha channel for professional compositing
 - Offloading Display PostScript entirely to dedicated hardware
 
-While the software never fully realized his hardware's potential (due to the i860's programming difficulty), Page's technical decisions — particularly the alpha channel — became foundational to modern graphics systems.
+Paquette's GaCK kernel was specifically designed for:
+- Soft real-time management of multiple threads
+- Single address space operation
+- Graphics workload optimization
 
-His departure in 1992 and NeXT's subsequent exit from hardware marked the end of an era, but his influence persists in every composited window and transparent UI element in macOS and iOS today.
+While the software never fully realized the hardware's potential (due to the i860's programming difficulty), the technical decisions made by both engineers became foundational to modern graphics systems.
+
+Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his influence persists in every composited window and transparent UI element in macOS and iOS today. Paquette continued this legacy at Apple, where he spent a decade architecting Quartz — essentially re-creating Display PostScript for the modern era.
 
 ---
 
@@ -231,13 +258,15 @@ His departure in 1992 and NeXT's subsequent exit from hardware marked the end of
 ### Primary
 - [Page, Rich oral history, part 1 (CHM 102780988)](https://www.computerhistory.org/collections/catalog/102780988)
 - [Page, Rich oral history, part 2 (CHM 102740462)](https://www.computerhistory.org/collections/catalog/102740462)
+- **Game Engine Black Book: DOOM** — Fabien Sanglard, 2018 (contains Mike Paquette quotes about GaCK kernel)
 
 ### Secondary
 - [NeXTdimension - Wikipedia](https://en.wikipedia.org/wiki/NeXTdimension)
 - [Intel i860 - Wikipedia](https://en.wikipedia.org/wiki/Intel_i860)
 - [Rich Page - Wikipedia](https://en.wikipedia.org/wiki/Rich_Page)
 - [NeXTdimension History Documentation](../../nextdimension/docs/hardware/nextdimension-history.md) (local)
+- [Slashdot: Former Apple Quartz Architect Describes Quartz History (2003)](https://apple.slashdot.org/story/03/02/11/1920216/former-apple-quartz-architect-describes-quartz-history) — References Mike Paquette as Quartz architect
 
 ---
 
-*This research completes the investigation into who designed the NeXTdimension board, answering the question left open in NeXTdimensionArchitects.md.*
+*This research completes the investigation into who designed the NeXTdimension board, answering the question left open in NeXTdimensionArchitects.md. Updated January 2026 with Mike Paquette attribution from Game Engine Black Book: DOOM.*

@@ -20,17 +20,22 @@ Based on Computer History Museum oral histories and US Patent 7716450B2 (filed 1
 
 **Question:** Who designed the NeXTdimension graphics accelerator board?
 
-**Answer:** **Rich Page** — Primary architect of the NeXTdimension.
+**Answer:**
+- **Rich Page** — Primary hardware architect of the NeXTdimension
+- **Mike Paquette** — Wrote the GaCK kernel that ran on the i860 processor
 
 Page's key contributions:
 - Selected the Intel i860 processor ("Cray on a chip")
 - Advocated for 32-bit color with 8-bit alpha channel
-- Designed the coprocessor architecture with dedicated Mach kernel
-- Led the NRW (NeXT RISC Workstation) follow-on project
+- Designed the coprocessor architecture with dedicated memory
+
+Paquette's key contributions:
+- Wrote **GaCK** (Graphics aCcelerator Kernel) — a custom kernel, NOT Mach
+- Later became **Quartz architect** at Apple, recreating Display PostScript for macOS
 
 The board never reached its potential due to the i860's programming difficulty — the software team couldn't port full Display PostScript to it. This "cultural rift" between Page's hardware team and Tevanian's software team explains why hardware attribution was harder to find than software attribution.
 
-Based on Computer History Museum oral histories, parts 1 & 2 (CHM 102780988, 102740462).
+Based on Computer History Museum oral histories (CHM 102780988, 102740462) and Game Engine Black Book: DOOM (Fabien Sanglard, 2018).
 
 ### NeXTdimensionArchitects.md *(Superseded)*
 
