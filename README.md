@@ -280,5 +280,6 @@ The original documentation is copyrighted material now owned by Apple Inc. (thro
 
 Historical research exploring the people and decisions behind NeXTSTEP development.
 
-- [Who Architected NeXT's Memory Management System?](Research/MemoryManagementArchitects.md) — Research into the origins of retain/release/autorelease, based on Computer History Museum oral histories and patent records. Concludes that Blaine Garst, Bertrand Serlet, Ali Ozer, and Trey Matteson co-designed the system.
-- [Rich Page: Architect of the NeXTdimension](Research/RichPage_NeXTdimension.md) — Complete research into the i860-based graphics accelerator board. Rich Page was the primary architect, advocating for the i860 processor and 32-bit color with alpha channel. Based on CHM oral histories parts 1 & 2.
+- [Who Architected NeXT's Memory Management System?](Research/MemoryManagementArchitects.md) — Research into the origins of retain/release/autorelease. Concludes that Blaine Garst, Bertrand Serlet, Ali Ozer, and Trey Matteson co-designed the system. Based on CHM oral histories and US Patent 7716450B2.
+
+- [Rich Page: Architect of the NeXTdimension](Research/RichPage_NeXTdimension.md) — Comprehensive research into the i860-based graphics accelerator board. **Rich Page** was the hardware architect (i860 selection, alpha channel advocacy). **Mike Paquette** wrote the GaCK kernel and later became Apple's Quartz architect. Includes Paquette's pre-NeXT work at Pixar with Pat Hanrahan (2019 Turing Award winner). Based on CHM oral histories, Game Engine Black Book: DOOM, ACM papers, NeXTWORLD interviews, and comp.sys.next Usenet archives.
