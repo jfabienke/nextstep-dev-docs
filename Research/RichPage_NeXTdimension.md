@@ -19,6 +19,23 @@
 
 Page led all hardware development at NeXT as co-founder and VP of Digital Hardware Engineering. While the original NeXT Cube was revolutionary for its software, Page felt it was underpowered for high-end graphics. The NeXTdimension was his solution.
 
+**The Founding Team (1985):**
+
+In the iconic NeXT founding team photo, Page appears bearded in the back row, second from left:
+
+| Position | Person | Role |
+|----------|--------|------|
+| Back row, L→R | George Crow | VP Analog Hardware Engineering |
+| | **Rich Page** | VP Digital Hardware Engineering |
+| | Steve Jobs | CEO |
+| | Bud Tribble | VP Software Engineering |
+| | Dan'l Lewin | VP Marketing |
+| | (6th person) | Possibly Bruce Blumberg |
+| Front row | (male) | Early employee |
+| | Susan Barnes | Chief Financial Officer |
+
+Page had just left Apple as an Apple Fellow (awarded 1983) to join Jobs. He was responsible for Apple's decision to use the Motorola 68000 in the Lisa and Macintosh.
+
 **Key Contributions:**
 - Selected the Intel i860 processor
 - Advocated for 32-bit color with 8-bit alpha channel
@@ -364,6 +381,8 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 
 ### NeXTWORLD Magazine
 - **"Rich Page looks ahead"** — Interview by Simson L. Garfinkel, NeXTWORLD Senior Editor. Candid assessments of optical disc, processors, keyboard, and portable strategy.
+- **NeXTWORLD Vol. 1 No. 4 (Winter 1991)** — [Archive.org](https://archive.org/details/NeXTWORLDVol.1No.4Winter1991) — Contains Avie Tevanian profile (Director of System Software, 15-person team), names John Seamons and Mike Demoney as Mach porters.
+- **NeXTWORLD 1991-1992 collection** — [Archive.org](https://archive.org/details/nextworld-1992) — Full magazine scans with technical articles and interviews.
 
 ### Forum & Usenet Archives
 - [nextcomputers.org: Hosting for OPENSTEP 4.2 boot disk (topic 191)](https://www.nextcomputers.org/forums/index.php?topic=191.0) — Contains Mike Paquette Usenet post from June 27, 1997, and discussion of his work on DPS, NEXTTIME, and NRW

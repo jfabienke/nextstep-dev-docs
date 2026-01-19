@@ -76,16 +76,31 @@ Initial research document before Rich Page oral history Part 2 was discovered. K
 
 ## Key People Identified
 
+### NeXT Founding Team (1985)
+
 | Person | Role | Key Contribution |
 |--------|------|------------------|
-| **Rich Page** | VP Digital Hardware Engineering | NeXTdimension hardware architect, i860 selection, alpha channel advocacy |
+| **Steve Jobs** | CEO | Company founder, vision |
+| **Rich Page** | VP Digital Hardware Engineering | NeXTdimension architect, i860 selection, alpha channel |
+| **George Crow** | VP Analog Hardware Engineering | Video I/O circuitry, power systems |
+| **Bud Tribble** | VP Software Engineering | Early software leadership |
+| **Dan'l Lewin** | VP Marketing | Sales and marketing strategy |
+| **Susan Barnes** | CFO | Financial management |
+
+### Engineers and Technical Staff
+
+| Person | Role | Key Contribution |
+|--------|------|------------------|
+| **Avie Tevanian** | Director of System Software | Mach kernel, 15-person team, later Apple SVP |
 | **Mike Paquette** | Engineer (Pixar → NeXT → Apple) | GaCK kernel, DPS, NEXTTIME, Quartz architect |
 | **Blaine Garst** | Engineer | Reference counting, later ARC at Apple |
-| **Bertrand Serlet** | Manager | Foundation framework leader |
+| **Bertrand Serlet** | Manager | Foundation framework leader, later Apple SVP |
 | **Ali Ozer** | Engineer | Foundation classes co-author |
-| **Avie Tevanian** | VP Software Engineering | Mach kernel, led software team |
-| **George Crow** | VP Analog Hardware Engineering | Video I/O circuitry |
-| **Pat Hanrahan** | Pixar (Paquette's colleague) | 2019 Turing Award, co-authored graphics paper |
+| **John Seamons** | Engineer | Ported Mach to NeXT hardware (with Demoney) |
+| **Mike Demoney** | Engineer | Ported Mach to NeXT hardware (with Seamons) |
+| **Keith Ohlfs** | Illustrator/Programmer | Created NeXT artwork with custom image software |
+| **Pat Hanrahan** | Pixar (Paquette's colleague) | 2019 Turing Award, co-authored Chap/Flap paper |
+| **Rick Rashid** | CMU (Tevanian's advisor) | Mach kernel creator, later Microsoft Research |
 
 ---
 
@@ -105,6 +120,8 @@ Research in this directory draws from:
 - **Technical histories** — Game Engine Black Book: DOOM (Fabien Sanglard)
 - **Wikipedia and wikis** — NeXT Wiki, Apple Wiki
 - **Forum discussions** — nextcomputers.org community research
+- **Magazine archives** — NeXTWORLD 1991-1992 issues on Archive.org
+- **Historical photographs** — NeXT founding team photo (1985)
 
 ### Research Approach
 The goal is to connect the "what" (the documentation we're preserving) with the "who" and "why" (the people and decisions that created it). Hardware attribution proved harder to find than software attribution due to:
