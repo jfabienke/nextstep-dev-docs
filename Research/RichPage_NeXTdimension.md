@@ -27,7 +27,12 @@ Page led all hardware development at NeXT as co-founder and VP of Digital Hardwa
 
 ### Mike Paquette — GaCK Kernel Author
 
-**Mike Paquette** (`mpaquette@moviola.next.com` as of 1997) was the NeXT engineer who wrote the kernel that ran on the NeXTdimension's i860 processor.
+**Mike Paquette** was the NeXT engineer who wrote the kernel that ran on the NeXTdimension's i860 processor.
+
+**Known Email Addresses (from Usenet archives):**
+- `mpaque@wco.com` (Dec 31, 1996) — personal account
+- `mpaque@next.com` (Jan 14, 1997) — NeXT Software, Inc.
+- `mpaquette@moviola.next.com` (June 27, 1997) — the `moviola` subdomain was likely NeXT's video/media team server (named after the 1924 Moviola film editing machine), consistent with his work on NEXTTIME
 
 **Key Contributions at NeXT:**
 - Wrote **GaCK** (Graphics aCcelerator Kernel) — the custom kernel for NeXTdimension
@@ -286,6 +291,8 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 
 ### Forum & Usenet Archives
 - [nextcomputers.org: Hosting for OPENSTEP 4.2 boot disk (topic 191)](https://www.nextcomputers.org/forums/index.php?topic=191.0) — Contains Mike Paquette Usenet post from June 27, 1997, and discussion of his work on DPS, NEXTTIME, and NRW
+- [nextcomputers.org: Usenet Soft.htm (1996)](https://www.nextcomputers.org/NeXTfiles/Docs/Usenet/news/1996/Soft.htm) — Dec 31, 1996 post from Paquette about 2.88MB floppy drives (Sony/Toshiba joint development, NeXT among first to use them)
+- [nextcomputers.org: Usenet Bugs.htm (1996-1997)](https://www.nextcomputers.org/NeXTfiles/Docs/Usenet/news/1996/Bugs.htm) — Jan 14, 1997 post from Paquette on Dynamic Libraries
 - **comp.sys.next.*** Usenet archives — Mike Paquette's posts discussing NRW variants (M88K, dual PPC 601) and early NeXTSTEP development on Sun M68K workstations
 
 ---
