@@ -27,12 +27,17 @@ Page led all hardware development at NeXT as co-founder and VP of Digital Hardwa
 
 ### Mike Paquette — GaCK Kernel Author
 
-**Mike Paquette** was the NeXT engineer who wrote the kernel that ran on the NeXTdimension's i860 processor.
+**Mike Paquette** (`mpaquette@moviola.next.com` as of 1997) was the NeXT engineer who wrote the kernel that ran on the NeXTdimension's i860 processor.
 
-**Key Contributions:**
+**Key Contributions at NeXT:**
 - Wrote **GaCK** (Graphics aCcelerator Kernel) — the custom kernel for NeXTdimension
+- Worked on **Display PostScript (DPS)** — the graphics rendering system
+- Developed **NEXTTIME** — NeXT's QuickTime-compatible video player ($99, supported QuickTime file format and Cinepak compression)
 - Created IOHIDevice code at NeXT (May 22, 1992)
-- Later became **Quartz architect** at Apple
+- Discussed **NRW** variants in Usenet posts (M88K and dual PPC 601 configurations)
+
+**Later at Apple:**
+- Became **Quartz architect**, spending "a decade re-creating Display PostScript as Quartz"
 
 **From Game Engine Black Book: DOOM:**
 > "The NeXTdimension ran a custom kernel which was designed to do soft real-time management of multiple threads within a single address space... The kernel was called 'Graphics aCcelerator Kernel, or 'GaCK'. Yes, this was a jape at the funny capitalization of the company name. It was not Mach, or BSD, or Minix, or Linux."
@@ -41,7 +46,7 @@ Page led all hardware development at NeXT as co-founder and VP of Digital Hardwa
 **Critical Correction:** Earlier accounts (including initial versions of this document) stated the NeXTdimension ran a "stripped-down Mach kernel." This is incorrect. GaCK was a completely custom kernel designed specifically for soft real-time graphics workloads.
 
 **Career Arc:**
-Paquette's work on GaCK directly informed his later role at Apple, where he spent "a decade re-creating Display PostScript as Quartz." The compositing architecture pioneered on the NeXTdimension became the foundation for macOS's window server.
+Paquette's work spanned the entire graphics stack at NeXT: from low-level kernel (GaCK), through rendering (DPS), to media playback (NEXTTIME). This directly informed his later role at Apple architecting Quartz. The compositing architecture pioneered on the NeXTdimension became the foundation for macOS's window server.
 
 ---
 
@@ -115,9 +120,13 @@ Page's work on the NeXTdimension was actually a **stepping stone** to a much lar
 
 **The Vision:**
 - Next-generation NeXT computer
-- Potentially powered by dual i860 processors
-- Later designs considered PowerPC
+- Multiple processor configurations were explored:
+  - Dual i860 processors (original concept)
+  - **Motorola 88000 (M88K)** variant
+  - **Dual PowerPC 601** variant
 - Would have been NeXT's answer to high-end SGI workstations
+
+**Historical Note:** Mike Paquette discussed NRW configurations in his comp.sys.next Usenet posts, revealing that both M88K and dual PPC 601 designs were seriously considered before NeXT abandoned hardware entirely.
 
 **The Fallout:**
 As NeXT struggled financially, an internal battle intensified:
@@ -172,6 +181,14 @@ Even though the hardware division was shuttered shortly after Page left, his tec
 - macOS window compositing (Quartz)
 - iOS graphics architecture
 - Modern GPU rendering pipelines
+
+---
+
+## Historical Notes
+
+### Early NeXTSTEP Development
+
+According to Mike Paquette's Usenet posts (discovered via nextcomputers.org forums), NeXT did extensive work on early NeXTSTEP pre-releases (versions as early as 0.1) on **Sun M68K workstations** because NeXT's own M68K hardware wasn't ready yet. This explains why NeXTSTEP was always relatively portable — it was never developed exclusively on NeXT hardware from the start.
 
 ---
 
@@ -267,6 +284,14 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 - [NeXTdimension History Documentation](../../nextdimension/docs/hardware/nextdimension-history.md) (local)
 - [Slashdot: Former Apple Quartz Architect Describes Quartz History (2003)](https://apple.slashdot.org/story/03/02/11/1920216/former-apple-quartz-architect-describes-quartz-history) — References Mike Paquette as Quartz architect
 
+### Forum & Usenet Archives
+- [nextcomputers.org: Hosting for OPENSTEP 4.2 boot disk (topic 191)](https://www.nextcomputers.org/forums/index.php?topic=191.0) — Contains Mike Paquette Usenet post from June 27, 1997, and discussion of his work on DPS, NEXTTIME, and NRW
+- **comp.sys.next.*** Usenet archives — Mike Paquette's posts discussing NRW variants (M88K, dual PPC 601) and early NeXTSTEP development on Sun M68K workstations
+
 ---
 
-*This research completes the investigation into who designed the NeXTdimension board, answering the question left open in NeXTdimensionArchitects.md. Updated January 2026 with Mike Paquette attribution from Game Engine Black Book: DOOM.*
+*This research completes the investigation into who designed the NeXTdimension board, answering the question left open in NeXTdimensionArchitects.md.*
+
+*Updated January 2026:*
+- *Added Mike Paquette attribution from Game Engine Black Book: DOOM*
+- *Added NRW variants (M88K, dual PPC 601) and NEXTTIME from nextcomputers.org forum / Usenet archives*
