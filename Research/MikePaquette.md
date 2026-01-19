@@ -206,26 +206,45 @@ Paquette explained the relationship:
 
 > "Quartz supports drawing primitives similar to those in the DPS client library for NeXTSTEP, but without the full PostScript language overhead — no DPS or PS wrappers, as this optimization for server-side graphics is not needed in the Quartz client-side model."
 
-### Why Not X11?
+### Why Not X11? (Slashdot, August 19, 2003)
 
-Paquette famously explained Apple's decision not to use X Window System for Mac OS X's GUI. His technical breakdown listed features Apple required:
+Paquette (posting as **mpaque**, user 655244) famously explained Apple's decision not to use X Window System for Mac OS X's GUI in a detailed Slashdot comment.
 
-- Resolution-independent outline fonts with anti-aliasing
-- Rich imaging model with PostScript-like paths
-- ColorSync color management
-- Pervasive alpha transparency and Porter-Duff compositing
-- Affine and mesh transforms for UI effects
-- Tight integration with OpenGL for 3D and video acceleration
+**Quartz Design Philosophy:**
 
-His conclusion:
+> "Apple-original window system that is graphics model agnostic... maps very well to PDF"
 
-> "Once Apple added support for all the features it wanted... it would not bear much resemblance to X11 nor be compatible with other servers anyway."
+The system supports both buffered and unbuffered windows while working equally well with QuickDraw, OpenGL, the Quartz drawing engine, X11, and third-party solutions.
+
+**Nine Extensions Required to Adapt X11:**
+
+Paquette outlined what Apple would need to add to X11:
+
+1. **Font server enhancements** — outline fonts and antialiased masks
+2. **PostScript-like path operations** — for vector drawing
+3. **Dithering with phase controls** — to the X marking engine
+4. **ColorSync support** — for color-managed graphics
+5. **Alpha channel and Porter-Duff compositing** — both for drawing in a window AND for interactions between windows
+6. **Affine transforms for windows** — rotation, scaling
+7. **Mesh-warp window capabilities** — for effects like the Genie minimize
+8. **OpenGL integration** — with video hardware
+9. **Transport efficiency** — streaming 200 MB/sec of commands and textures
+
+**The Conclusion:**
+
+> "There doesn't appear to be much code left from the original X server in the drawing path or windowing machinery... Just what did we gain from this?"
 
 And humorously:
 
 > The only benefit of X11 would be that his mom could run an xterm on the Mac without downloading X11.app.
 
+**Additional Clarification (Slashdot, November 2006):**
+
+> "The Mac OS X window system and the Quartz and PDF rendering layers are completely new in Mac OS X, and do not share any code with the Display PostScript system from NeXTSTEP."
+
 This explanation has been cited in Wikipedia and other sources as the definitive word on Apple's windowing system decision.
+
+**Source:** [Slashdot comment by mpaque (655244)](https://developers.slashdot.org/comments.pl?sid=75257&cid=6734612)
 
 ### Legacy at Apple
 
@@ -288,20 +307,26 @@ Every anti-aliased window and every PDF printed from a Mac traces back to Paquet
 
 ## Sources
 
-### Primary
+### Primary — Mike Paquette's Own Posts
+- [Slashdot comment (August 19, 2003)](https://developers.slashdot.org/comments.pl?sid=75257&cid=6734612) — "Why Apple didn't use X11" (mpaque, user 655244)
+- [Slashdot comment (November 2006)](https://slashdot.org/story/06/11/24/1232238/dumping-aqua-on-mac-os-x-for-x11) — "Quartz and PDF rendering layers are completely new"
 - Mike Paquette Usenet posts (comp.sys.next.*) via nextcomputers.org
 - Game Engine Black Book: DOOM (Fabien Sanglard, 2018) — GaCK kernel quotes
+
+### Primary — Technical References
 - "Parallel Computers for Graphics Applications" (ACM 1987) — Pixar work with Hanrahan
-- Slashdot/Hacker News discussions with Paquette's X11 rationale
+- [Apple open source: IOHIDevice.h](https://opensource.apple.com/source/IOHIDFamily/IOHIDFamily-258.14/IOHIDSystem/IOKit/hidsystem/IOHIDevice.h.auto.html) — "22 May 1992 Mike Paquette at NeXT Created"
 
 ### Secondary
 - NeXTdimension firmware reverse-engineering (2024-2025)
-- Wikipedia articles on Quartz, Display PostScript
+- Wikipedia articles on Quartz, Display PostScript, X Window System
 - NeXTWORLD magazine archives
+- [Hacker News discussion (2013)](https://news.ycombinator.com/item?id=5841976) — "Quartz architect Mike Paquette"
+- [Slashdot: 20 Years of Mac OS X (2021)](https://apple.slashdot.org/story/21/03/25/2044237/its-been-20-years-since-the-launch-of-mac-os-x)
 
 ### Forum Archives
 - nextcomputers.org forums (topic 191 and others)
-- comp.sys.next.* Usenet archives
+- comp.sys.next.* Usenet archives via narkive.com
 
 ---
 
