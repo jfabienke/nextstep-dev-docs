@@ -87,20 +87,40 @@ Initial research document before Rich Page oral history Part 2 was discovered. K
 | **Dan'l Lewin** | VP Marketing | Sales and marketing strategy |
 | **Susan Barnes** | CFO | Financial management |
 
-### Engineers and Technical Staff
+### Avie Tevanian's Software Team (~15 people)
 
 | Person | Role | Key Contribution |
 |--------|------|------------------|
-| **Avie Tevanian** | Director of System Software | Mach kernel, 15-person team, later Apple SVP |
-| **Mike Paquette** | Engineer (Pixar → NeXT → Apple) | GaCK kernel, DPS, NEXTTIME, Quartz architect |
-| **Blaine Garst** | Engineer | Reference counting, later ARC at Apple |
-| **Bertrand Serlet** | Manager | Foundation framework leader, later Apple SVP |
-| **Ali Ozer** | Engineer | Foundation classes co-author |
-| **John Seamons** | Engineer | Ported Mach to NeXT hardware (with Demoney) |
-| **Mike Demoney** | Engineer | Ported Mach to NeXT hardware (with Seamons) |
-| **Keith Ohlfs** | Illustrator/Programmer | Created NeXT artwork with custom image software |
+| **Avie Tevanian** | Director of System Software | Led 15-person team, Mach kernel, later Apple SVP |
+| **John Seamons** | Kernel Engineer | Ported Mach to NeXT hardware |
+| **Mike Demoney** | Kernel Engineer | Ported Mach to NeXT hardware, patent collaborator |
+| **Steve Naroff** | Compiler Engineer | Objective-C/GCC integration, "categories" feature |
+| **Blaine Garst** | Runtime Engineer | Protocols, reference counting → ARC at Apple |
+| **Bertrand Serlet** | Framework Engineer | Protocols, Foundation framework → Apple SVP |
+| **Ali Ozer** | Framework Engineer | Foundation classes co-author |
+| **Trey Matteson** | Software Engineer | Autorelease patent co-inventor |
+| **Chris Franklin** | Software Engineer | (Documented in Stanford/Menuez photos) |
+| **Kevin Enderby** | Tools Engineer | Linker and assembler |
+| **Jean-Marie Hullot** | Interface Builder | Created IB (1986-1988), later Apple CTO Apps |
+| **Keith Ohlfs** | Illustrator/Programmer | Custom image software, NeXT artwork |
+| **Douglas Wiebe** | Engineer | Patent collaborator with Tevanian |
+| **Garth Snyder** | Engineer | Patent collaborator with Tevanian |
+| **Nick Kledzik** | Engineer | Patent collaborator |
+
+### Graphics and Hardware-Adjacent Engineers
+
+| Person | Role | Key Contribution |
+|--------|------|------------------|
+| **Mike Paquette** | Graphics/Kernel (Pixar → NeXT → Apple) | GaCK kernel, DPS, NEXTTIME → Quartz architect |
 | **Pat Hanrahan** | Pixar (Paquette's colleague) | 2019 Turing Award, co-authored Chap/Flap paper |
+
+### External Collaborators
+
+| Person | Role | Key Contribution |
+|--------|------|------------------|
 | **Rick Rashid** | CMU (Tevanian's advisor) | Mach kernel creator, later Microsoft Research |
+| **Brad Cox** | Stepstone | Objective-C creator |
+| **Tom Love** | Stepstone | Objective-C co-creator |
 
 ---
 
