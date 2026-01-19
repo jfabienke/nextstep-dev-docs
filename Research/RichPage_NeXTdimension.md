@@ -29,6 +29,22 @@ Page led all hardware development at NeXT as co-founder and VP of Digital Hardwa
 
 **Mike Paquette** was the NeXT engineer who wrote the kernel that ran on the NeXTdimension's i860 processor.
 
+**Background: Pixar (pre-NeXT)**
+
+Before joining NeXT, Paquette was at **Pixar** where he co-authored a seminal 1987 ACM paper with **Pat Hanrahan** (later 2019 Turing Award winner), Adam Levinthal, and Jim Lawson:
+
+> **"Parallel Computers for Graphics Applications"** (ACM 1987)
+
+At Pixar, Paquette worked on:
+- **Chap (Channel Processor)** — 4-channel SIMD integer processor for RGBA image compositing
+- **Flap (Floating point Array Processor)** — for 3D shading and transformations
+- **C4 language** — parallel C extension for graphics programming
+- The **Pixar Image Computer** — commercial product based on this research
+
+The Chap/Flap architecture achieved 60-200x speedup over VAX 11/780 for graphics operations. Key insight: graphics primitives (pixels, vertices) are small data structures ideal for SIMD parallel processing.
+
+**The NeXT Connection:** Steve Jobs bought Pixar from Lucasfilm in 1986. Paquette moved from one Jobs company (Pixar) to another (NeXT), bringing deep expertise in parallel graphics processing and alpha channel compositing — exactly what the NeXTdimension would need.
+
 **Known Email Addresses (from Usenet archives):**
 - `mpaque@wco.com` — personal account
 - `mpaque@next.com` — "NeXT business mail only, please"
@@ -289,6 +305,7 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 - [Page, Rich oral history, part 1 (CHM 102780988)](https://www.computerhistory.org/collections/catalog/102780988)
 - [Page, Rich oral history, part 2 (CHM 102740462)](https://www.computerhistory.org/collections/catalog/102740462)
 - **Game Engine Black Book: DOOM** — Fabien Sanglard, 2018 (contains Mike Paquette quotes about GaCK kernel)
+- **"Parallel Computers for Graphics Applications"** — Levinthal, Hanrahan, Paquette, Lawson (ACM 1987) — Paquette's pre-NeXT work at Pixar on Chap/Flap processors
 
 ### Secondary
 - [NeXTdimension - Wikipedia](https://en.wikipedia.org/wiki/NeXTdimension)
