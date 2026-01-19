@@ -396,6 +396,7 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 
 ## Related Research
 
+- [MikePaquette.md](MikePaquette.md) — Comprehensive profile: Pixar → NeXT → Apple/Quartz
 - [Research README](README.md) — Full list of NeXT engineers and timeline
 - [MemoryManagementArchitects.md](MemoryManagementArchitects.md) — Software counterpart: Garst, Serlet, Ozer, Matteson
 

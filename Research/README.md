@@ -68,6 +68,36 @@ The board never reached its potential due to the i860's programming difficulty �
 
 ---
 
+### MikePaquette.md *(Comprehensive)*
+
+**Question:** What was Mike Paquette's full contribution to NeXT and Apple?
+
+**Answer:** Paquette was a senior engineer bridging hardware and software:
+
+**At Pixar (~1987):**
+- Co-authored Chap/Flap paper with Pat Hanrahan (2019 Turing Award winner)
+
+**At NeXT (1988-1997):**
+- Main person doing OS/ROM/driver work for Turbo 68040 systems
+- Delivered NeXTSTEP 2.2 for Turbo hardware
+- Introduced ADB support (v74 ROM)
+- Wrote GaCK kernel for NeXTdimension i860
+- Deep expertise in Display PostScript
+
+**At Apple (1997+):**
+- "designed/wrote a good part of Quartz"
+- "spent a decade re-creating Display PostScript as Quartz"
+- Famous explanation of why Apple didn't use X11
+- Cited as "Quartz team lead"
+
+#### Sources
+- Mike Paquette Usenet posts via nextcomputers.org
+- Game Engine Black Book: DOOM (Fabien Sanglard, 2018)
+- ACM 1987 paper "Parallel Computers for Graphics Applications"
+- Slashdot/Hacker News discussions
+
+---
+
 ## Key People Identified
 
 ### NeXT Founding Team (1985)
@@ -171,6 +201,7 @@ The goal is to connect the "what" (the documentation we're preserving) with the 
 |----------|-------|--------|
 | [MemoryManagementArchitects.md](MemoryManagementArchitects.md) | retain/release/autorelease architects | ✅ Complete |
 | [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) | NeXTdimension board architects | ✅ Complete |
+| [MikePaquette.md](MikePaquette.md) | Mike Paquette: Pixar → NeXT → Apple/Quartz | ✅ Complete |
 | [FutureResearchTopics.md](FutureResearchTopics.md) | Ideas for future research | 📋 Backlog |
 
 ---
