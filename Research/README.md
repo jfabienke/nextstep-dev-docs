@@ -171,6 +171,7 @@ The goal is to connect the "what" (the documentation we're preserving) with the 
 |----------|-------|--------|
 | [MemoryManagementArchitects.md](MemoryManagementArchitects.md) | retain/release/autorelease architects | ✅ Complete |
 | [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) | NeXTdimension board architects | ✅ Complete |
+| [FutureResearchTopics.md](FutureResearchTopics.md) | Ideas for future research | 📋 Backlog |
 
 ---
 
