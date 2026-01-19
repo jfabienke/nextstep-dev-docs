@@ -30,9 +30,17 @@ Page led all hardware development at NeXT as co-founder and VP of Digital Hardwa
 **Mike Paquette** was the NeXT engineer who wrote the kernel that ran on the NeXTdimension's i860 processor.
 
 **Known Email Addresses (from Usenet archives):**
-- `mpaque@wco.com` (Dec 31, 1996) — personal account
-- `mpaque@next.com` (Jan 14, 1997) — NeXT Software, Inc.
-- `mpaquette@moviola.next.com` (June 27, 1997) — the `moviola` subdomain was likely NeXT's video/media team server (named after the 1924 Moviola film editing machine), consistent with his work on NEXTTIME
+- `mpaque@wco.com` — personal account
+- `mpaque@next.com` — "NeXT business mail only, please"
+- `mpaquette@moviola.next.com` (June 1997) — the `moviola` subdomain was likely NeXT's video/media team server (named after the 1924 Moviola film editing machine), consistent with his work on NEXTTIME
+
+**Usenet Signature (Jan 1, 1997):**
+> "I don't speak for my employer, whoever it is, and they don't speak for me."
+
+The "whoever it is" is poignant — this was 11 days after Apple announced the NeXT acquisition (Dec 20, 1996).
+
+**On Video Editing Software (Jan 1, 1997):**
+When asked if there was any NeXTSTEP video editing software, Paquette replied simply: "Not yet..." — NEXTTIME was a player, not an editor. Given his work on the `moviola.next.com` server (named after editing equipment), video editing software may have been planned but never shipped.
 
 **Key Contributions at NeXT:**
 - Wrote **GaCK** (Graphics aCcelerator Kernel) — the custom kernel for NeXTdimension
