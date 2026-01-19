@@ -392,13 +392,12 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 
 ---
 
-*This research completes the investigation into who designed the NeXTdimension board, answering the question left open in NeXTdimensionArchitects.md.*
+*This research documents who designed the NeXTdimension board.*
 
 ## Related Research
 
 - [Research README](README.md) — Full list of NeXT engineers and timeline
 - [MemoryManagementArchitects.md](MemoryManagementArchitects.md) — Software counterpart: Garst, Serlet, Ozer, Matteson
-- [NeXTdimensionArchitects.md](NeXTdimensionArchitects.md) — Earlier research (superseded by this document)
 
 ---
 

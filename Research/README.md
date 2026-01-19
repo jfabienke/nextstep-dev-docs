@@ -68,12 +68,6 @@ The board never reached its potential due to the i860's programming difficulty �
 
 ---
 
-### NeXTdimensionArchitects.md *(Superseded)*
-
-Initial research document before Rich Page oral history Part 2 was discovered. Kept for reference on research methodology. See RichPage_NeXTdimension.md for complete findings.
-
----
-
 ## Key People Identified
 
 ### NeXT Founding Team (1985)
@@ -177,7 +171,6 @@ The goal is to connect the "what" (the documentation we're preserving) with the 
 |----------|-------|--------|
 | [MemoryManagementArchitects.md](MemoryManagementArchitects.md) | retain/release/autorelease architects | ✅ Complete |
 | [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) | NeXTdimension board architects | ✅ Complete |
-| [NeXTdimensionArchitects.md](NeXTdimensionArchitects.md) | Initial NeXTdimension research | ⚠️ Superseded |
 
 ---
 
