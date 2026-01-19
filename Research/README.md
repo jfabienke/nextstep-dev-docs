@@ -43,11 +43,14 @@ Based on Computer History Museum oral histories and US Patent 7716450B2 (filed 1
 - Work commercialized as the **Pixar Image Computer**
 
 **At NeXT (~1988-1997):**
-- Wrote **GaCK** (Graphics aCcelerator Kernel) — custom kernel for NeXTdimension i860, NOT Mach
+- Wrote **GaCK** (Graphics aCcelerator Kernel) — custom Mach-compatible OS for NeXTdimension i860
 - Worked on **Display PostScript (DPS)**
 - Developed **NEXTTIME** — QuickTime-compatible video player
 - Worked on `moviola.next.com` server (named after 1924 film editing machine)
 - When asked about video editing software (Jan 1997): "Not yet..." — editor may have been planned but never shipped
+
+**GaCK Firmware Analysis (2024-2025):**
+Modern reverse-engineering reveals GaCK is a **complete Mach-compatible multitasking OS** with 217 trap handlers, 73 lock operations, and 22 memory contexts. The firmware contains two OS layers: a Bootstrap Graphics HAL (32 KB) and the full GaCK kernel (160 KB) with Display PostScript interpreter. Paquette's statement "not Mach" is accurate — it's not the CMU codebase, but custom code implementing a Mach-compatible interface.
 
 **At Apple (1997+):**
 - Became **Quartz architect**, "spent a decade re-creating Display PostScript as Quartz"
@@ -61,6 +64,7 @@ The board never reached its potential due to the i860's programming difficulty �
 - "Parallel Computers for Graphics Applications" (ACM 1987)
 - NeXTWORLD magazine interview with Rich Page
 - comp.sys.next.* Usenet archives via nextcomputers.org
+- **nextdimension firmware reverse-engineering** — 192 KB verified i860 code analyzed, revealing GaCK's true architecture
 
 ---
 
@@ -95,6 +99,7 @@ Research in this directory draws from:
 - **Academic papers** — ACM publications with author attribution
 - **Usenet archives** — comp.sys.next.* posts preserved at nextcomputers.org
 - **Contemporary magazines** — NeXTWORLD interviews and articles
+- **Firmware reverse-engineering** — i860 ROM disassembly revealing GaCK kernel architecture
 
 ### Secondary Sources
 - **Technical histories** — Game Engine Black Book: DOOM (Fabien Sanglard)

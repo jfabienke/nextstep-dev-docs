@@ -72,7 +72,31 @@ When asked if there was any NeXTSTEP video editing software, Paquette replied si
 > "The NeXTdimension ran a custom kernel which was designed to do soft real-time management of multiple threads within a single address space... The kernel was called 'Graphics aCcelerator Kernel, or 'GaCK'. Yes, this was a jape at the funny capitalization of the company name. It was not Mach, or BSD, or Minix, or Linux."
 > — M Paquette, NeXT Engineer
 
-**Critical Correction:** Earlier accounts (including initial versions of this document) stated the NeXTdimension ran a "stripped-down Mach kernel." This is incorrect. GaCK was a completely custom kernel designed specifically for soft real-time graphics workloads.
+**Critical Correction:** Earlier accounts stated the NeXTdimension ran a "stripped-down Mach kernel." Paquette clarified it was custom. However, modern firmware reverse-engineering (see below) reveals a more nuanced picture.
+
+### GaCK Firmware Analysis (2024-2025)
+
+Reverse-engineering of the NeXTdimension ROM firmware (192 KB verified i860 code) reveals that GaCK is far more sophisticated than previously understood:
+
+**GaCK is a complete Mach-compatible multitasking operating system:**
+
+| Feature | Count | Implication |
+|---------|-------|-------------|
+| Trap instructions | 217 | Complete interrupt/exception/syscall infrastructure |
+| Lock operations | 73 | Concurrent execution support |
+| Memory context switches | 22 | Full multitasking (21 %dirbase writes) |
+| Privilege transitions | 31 | User/kernel mode separation |
+| Performance breakpoints | 88 | Built-in profiling support |
+
+**Two operating systems in firmware:**
+1. **Bootstrap Graphics HAL** (32 KB @ 0xF8000000) — Microkernel-level graphics subsystem with 82 primitives, zero traps, single-threaded
+2. **GaCK Mach Kernel** (160 KB @ 0xF8008000) — Full Mach-compatible OS with Display PostScript interpreter
+
+**Reconciling Paquette's statement:** GaCK is not Mach *itself* (not the CMU codebase), but it implements a **Mach-compatible interface** equivalent to Mach 2.5. It's custom code that speaks the Mach protocol — a peer kernel to the host 68040's Mach, not a port of it.
+
+**Architectural significance:** The NeXTdimension is not a graphics accelerator — it's an **entirely independent computer** running its own OS, providing Display PostScript services to the host. This peer-to-peer kernel architecture was decades ahead of modern GPU compute models (CUDA, OpenCL).
+
+**Source:** Firmware analysis from [nextdimension repository](https://github.com/), including `GACK_KERNEL_HARDWARE_SCAN.md` and `FINAL_ARCHITECTURAL_REVELATION.md`.
 
 **Career Arc:**
 Paquette's work spanned the entire graphics stack at NeXT: from low-level kernel (GaCK), through rendering (DPS), to media playback (NEXTTIME). This directly informed his later role at Apple architecting Quartz. The compositing architecture pioneered on the NeXTdimension became the foundation for macOS's window server.
