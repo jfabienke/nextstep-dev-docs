@@ -113,7 +113,7 @@ Reverse-engineering of the NeXTdimension ROM firmware (192 KB verified i860 code
 
 **Architectural significance:** The NeXTdimension is not a graphics accelerator — it's an **entirely independent computer** running its own OS, providing Display PostScript services to the host. This peer-to-peer kernel architecture was decades ahead of modern GPU compute models (CUDA, OpenCL).
 
-**Source:** Firmware analysis from [nextdimension repository](https://github.com/), including `GACK_KERNEL_HARDWARE_SCAN.md` and `FINAL_ARCHITECTURAL_REVELATION.md`.
+**Source:** Firmware analysis from the nextdimension reverse-engineering project, including `GACK_KERNEL_HARDWARE_SCAN.md` and `FINAL_ARCHITECTURAL_REVELATION.md`. See the [nextcomputers.org forum](https://www.nextcomputers.org/forums/) for community discussion of these findings.
 
 **Career Arc:**
 Paquette's work spanned the entire graphics stack at NeXT: from low-level kernel (GaCK), through rendering (DPS), to media playback (NEXTTIME). This directly informed his later role at Apple architecting Quartz. The compositing architecture pioneered on the NeXTdimension became the foundation for macOS's window server.
@@ -394,6 +394,18 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 
 *This research completes the investigation into who designed the NeXTdimension board, answering the question left open in NeXTdimensionArchitects.md.*
 
-*Updated January 2026:*
+## Related Research
+
+- [Research README](README.md) — Full list of NeXT engineers and timeline
+- [MemoryManagementArchitects.md](MemoryManagementArchitects.md) — Software counterpart: Garst, Serlet, Ozer, Matteson
+- [NeXTdimensionArchitects.md](NeXTdimensionArchitects.md) — Earlier research (superseded by this document)
+
+---
+
+*Last updated: January 2026*
+
+*Changelog:*
 - *Added Mike Paquette attribution from Game Engine Black Book: DOOM*
 - *Added NRW variants (M88K, dual PPC 601) and NEXTTIME from nextcomputers.org forum / Usenet archives*
+- *Added GaCK firmware reverse-engineering findings*
+- *Added Paquette's Pixar background and ACM 1987 paper*

@@ -171,4 +171,14 @@ The goal is to connect the "what" (the documentation we're preserving) with the 
 
 ---
 
+## Document Index
+
+| Document | Topic | Status |
+|----------|-------|--------|
+| [MemoryManagementArchitects.md](MemoryManagementArchitects.md) | retain/release/autorelease architects | ✅ Complete |
+| [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) | NeXTdimension board architects | ✅ Complete |
+| [NeXTdimensionArchitects.md](NeXTdimensionArchitects.md) | Initial NeXTdimension research | ⚠️ Superseded |
+
+---
+
 *Last updated: January 2026*

@@ -205,4 +205,13 @@ This collaborative approach produced a memory management architecture so well-de
 
 ---
 
+## Related Research
+
+- [Research README](README.md) — Full list of Avie Tevanian's ~15-person software team
+- [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) — Hardware counterpart: Rich Page and Mike Paquette
+
+---
+
 *This research was conducted while converting the NeXTSTEP 3.3 Developer Documentation to Markdown format for historical preservation.*
+
+*Last updated: January 2026*

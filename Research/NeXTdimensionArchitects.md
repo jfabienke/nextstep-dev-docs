@@ -1,24 +1,36 @@
 # Who Designed the NeXTdimension Board?
 
 **Research Date:** January 2026
-**Status:** Incomplete — Specific engineers not definitively identified
+**Status:** ✅ **SUPERSEDED** — See [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) for complete findings
 
 ---
 
 ## Summary
 
-Unlike the Foundation Kit memory management system where we found definitive attribution through patents and oral histories, the NeXTdimension board's specific designers remain undocumented in publicly available sources.
+> **This document is historical.** It represents initial research before discovering Rich Page's CHM oral history Part 2 and Mike Paquette's GaCK attribution. Kept for reference on research methodology.
+>
+> **Definitive Answer:**
+> - **Rich Page** — Primary hardware architect (i860 selection, alpha channel, coprocessor design)
+> - **Mike Paquette** — Wrote GaCK (Graphics aCcelerator Kernel), the custom OS for the i860
+>
+> See [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) for comprehensive research.
 
-**What we know:**
+---
+
+## Original Research (Pre-Discovery)
+
+The content below represents the state of research *before* the key sources were found. It is preserved to document the research methodology.
+
+### What we knew at the time:
 - The board was developed under **Rich Page** (VP Digital Hardware Engineering)
 - Analog components likely involved **George Crow** (VP Analog Hardware Engineering)
-- The Mach kernel port was likely overseen by **Avie Tevanian's** team
-- Display PostScript work involved engineers whose names are not publicly documented
+- The kernel was likely overseen by **Avie Tevanian's** team
+- Display PostScript work involved engineers whose names were not publicly documented
 
-**What we don't know:**
-- The specific engineer(s) who designed the i860-based graphics architecture
-- Who ported the Mach kernel to the i860 processor
-- Who worked on the Display PostScript acceleration (never completed)
+### What we didn't know:
+- The specific engineer(s) who designed the i860-based graphics architecture → **Answer: Rich Page**
+- Who wrote the kernel for the i860 processor → **Answer: Mike Paquette (GaCK)**
+- Who worked on the Display PostScript acceleration → **Answer: Mike Paquette**
 
 ---
 
@@ -67,7 +79,9 @@ These would have fallen under Crow's analog hardware division, though no documen
 Avie Tevanian led NeXTSTEP development, having co-created the Mach kernel at Carnegie Mellon University.
 
 **Relevance to NeXTdimension:**
-The NeXTdimension ran a stripped-down Mach kernel on its i860 processor. This port was likely developed under Tevanian's software organization, though the specific engineer who performed the port is not documented.
+*[Original speculation — later corrected]*: We initially assumed the NeXTdimension ran a stripped-down Mach kernel on its i860 processor.
+
+**Correction:** Mike Paquette clarified that GaCK was *not* Mach — it was custom code implementing a Mach-compatible interface. See [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) for the full story.
 
 ---
 
@@ -196,25 +210,21 @@ Douglas Menuez photographed NeXT extensively. His archives might identify engine
 
 ## What We Can Conclude
 
+> **Note:** This section reflects our conclusions *before* discovering key sources. All "Unknown" items have since been resolved.
+
 ### Definite:
 - **Rich Page** led the hardware division that created the NeXTdimension
 - **George Crow** led analog hardware (video I/O circuitry)
 - The board was a **team effort** under their leadership
 
-### Probable:
-- **Avie Tevanian's** team handled the Mach kernel port to i860
-- Multiple unnamed engineers worked on:
-  - i860 hardware design
-  - Memory subsystem
-  - Video capture/output
-  - NeXTbus interface
-  - Display PostScript integration
+### Probable (at the time):
+- ~~**Avie Tevanian's** team handled the Mach kernel port to i860~~ → **Corrected:** Mike Paquette wrote GaCK independently
 
-### Unknown:
-- Specific individual(s) who architected the i860-based graphics system
-- Who ported Mach to the i860
-- Who worked on the never-completed Display PostScript acceleration
-- Who designed the JPEG daughter board prototypes
+### Unknown (now resolved):
+- ~~Specific individual(s) who architected the i860-based graphics system~~ → **Rich Page**
+- ~~Who ported Mach to the i860~~ → **Mike Paquette wrote GaCK (custom, not a Mach port)**
+- ~~Who worked on the Display PostScript acceleration~~ → **Mike Paquette**
+- Who designed the JPEG daughter board prototypes — *still unknown*
 
 ---
 
@@ -257,17 +267,21 @@ The board represents NeXT's engineering ambition and the challenges of building 
 
 ---
 
-## Recommendation
+## Recommendation (Completed)
 
-To definitively answer "Who designed the NeXTdimension?", the most promising approach would be:
+> **Research Complete:** The question "Who designed the NeXTdimension?" has been answered.
+>
+> See [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) for the definitive account.
 
-1. **Watch Rich Page's full 3-hour oral history** at CHM
-2. **Contact NeXT alumni** through LinkedIn or retrocomputing communities
-3. **Search Stanford University archives** for NeXT corporate records
-4. **Post inquiry on nextcomputers.org forums** where NeXT enthusiasts and former employees participate
+The approaches that succeeded:
 
-The attribution may exist in unpublished interviews, internal documents, or the memories of people who were there — it's just not readily accessible through public web searches.
+1. ✅ **Watch Rich Page's full oral history** at CHM — Part 2 (102740462) covered NeXTdimension
+2. ✅ **Search technical histories** — Game Engine Black Book: DOOM contained Mike Paquette's GaCK quote
+3. ✅ **Post inquiry on nextcomputers.org forums** — Forum archives led to Usenet posts from Paquette
+4. ✅ **Firmware reverse-engineering** — Modern analysis of NeXTdimension ROM confirmed GaCK architecture
 
 ---
 
-*This research was conducted while exploring the history of NeXT hardware for the nextstep-dev-docs repository.*
+*This document preserved as a record of the research process.*
+
+*See [RichPage_NeXTdimension.md](RichPage_NeXTdimension.md) for the complete findings.*
