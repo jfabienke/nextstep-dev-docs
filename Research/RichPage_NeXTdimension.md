@@ -221,6 +221,30 @@ According to Mike Paquette's Usenet posts (discovered via nextcomputers.org foru
 
 ---
 
+## Contemporary Interviews
+
+### NeXTWORLD Interview: "Rich Page looks ahead"
+**Source:** NeXTWORLD magazine (Simson L. Garfinkel, Senior Editor)
+
+Rich Page's candid assessments of NeXT's decisions:
+
+**On the optical disc:**
+> "Was that a mistake? **Probably...**"
+> "The combination of the Winchester and the optical disc made a good product, but it was too expensive. And the optical-only system didn't work very well."
+
+**On processors:**
+> "A year or two ago, you might have been inclined to pick MIPS. Yet if you'd done that, today you would be asking yourself, 'Why did I pick MIPS? It looks like they're going out of business.'"
+>
+> "That basically leaves SPARC, 88K... And you don't want to go with Intel, because... they charge you extra for DOS compatibility."
+
+**On the keyboard (everyone hated it):**
+> "**Everybody hates the new keyboard.** We'll probably change our keyboard... What happened on this one was that in the process of internationalizing and solving certain problems, we caused certain problems — like moving the backslash and the pipe for the UNIX folks. That was probably a mistake."
+
+**On portables (prescient):**
+> "I think that what people want is **the ability to carry their NeXTstation around and use it when they get somewhere**. Transportability is the important issue."
+
+---
+
 ## Oral History Sources
 
 ### Part 1: The Original Cube Era (1985-1988)
@@ -313,6 +337,9 @@ Page's departure in 1992 marked the end of NeXT's hardware ambitions, but his in
 - [Rich Page - Wikipedia](https://en.wikipedia.org/wiki/Rich_Page)
 - [NeXTdimension History Documentation](../../nextdimension/docs/hardware/nextdimension-history.md) (local)
 - [Slashdot: Former Apple Quartz Architect Describes Quartz History (2003)](https://apple.slashdot.org/story/03/02/11/1920216/former-apple-quartz-architect-describes-quartz-history) — References Mike Paquette as Quartz architect
+
+### NeXTWORLD Magazine
+- **"Rich Page looks ahead"** — Interview by Simson L. Garfinkel, NeXTWORLD Senior Editor. Candid assessments of optical disc, processors, keyboard, and portable strategy.
 
 ### Forum & Usenet Archives
 - [nextcomputers.org: Hosting for OPENSTEP 4.2 boot disk (topic 191)](https://www.nextcomputers.org/forums/index.php?topic=191.0) — Contains Mike Paquette Usenet post from June 27, 1997, and discussion of his work on DPS, NEXTTIME, and NRW
